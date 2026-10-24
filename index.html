@@ -23,6 +23,22 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" />
 <link rel="stylesheet" href="styles.css" />
+
+<script>
+/* Runs before first paint. The loader is CSS-hidden by default so it can
+   never flash in after the content has already rendered; this opts it in
+   only when JS is actually running. The timeout is a failsafe: if the GSAP
+   CDN is slow or dead, motion.js never clears the loader, so clear it here
+   and let the page through. Nobody waits on a decoration. */
+(function () {
+  var h = document.documentElement;
+  h.className += ' js-on';
+  setTimeout(function () {
+    var l = document.getElementById('loader');
+    if (l) l.className += ' is-done';
+  }, 2500);
+})();
+</script>
 </head>
 <body>
 

@@ -116,19 +116,23 @@ canvas { display: block; }
 
 /* ─────────────────────────────── Loader ─────────────────────────────── */
 
-.loader {
+/* Hidden by default so it can never appear *after* the content has painted.
+   The inline script in <head> opts it in before first paint when JS is on,
+   and clears it on a timer if motion.js never arrives. */
+.loader { display: none; }
+
+html.js-on .loader {
   position: fixed;
   inset: 0;
   z-index: 8000;
   display: grid;
   place-content: center;
+  justify-items: center;
   gap: 1.5rem;
   background: var(--ink);
   transition: opacity 0.7s var(--ease), visibility 0.7s;
 }
-.loader.is-done { opacity: 0; visibility: hidden; }
-/* If motion.js never runs, the loader must not trap the page */
-html:not(.motion-on) .loader { display: none; }
+html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
 
 .loader__mark {
   font-family: var(--display);
