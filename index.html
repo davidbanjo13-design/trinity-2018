@@ -1,50 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Trinity School Reunion</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Trinity School Bexley · Year 11 · Class of 2018 — The Reunion</title>
+<meta name="description" content="It's been eight years. A reunion for Trinity School Bexley, Year 11, Class of 2018. Sign up free and you'll be first to hear when the date is locked." />
+<meta name="theme-color" content="#07080B" />
+
+<!-- Share card: WhatsApp / iMessage / socials. Designed image lands with the memories wall. -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://trinity-2018.netlify.app/" />
+<meta property="og:site_name" content="Trinity 2018 Reunion" />
+<meta property="og:title" content="Trinity School Bexley. Year 11. Class of 2018." />
+<meta property="og:description" content="It's been eight years... I think it's time. Sign up free — you'll be the first to hear when the date's locked." />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Trinity School Bexley. Year 11. Class of 2018." />
+<meta name="twitter:description" content="It's been eight years... I think it's time." />
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2307080B'/><text y='70' x='50' text-anchor='middle' font-family='Georgia,serif' font-size='52' fill='%23E9B949'>T</text></svg>" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" />
+<link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <h1>Trinity School Bexley. Year 11. Class of 2018.</h1>
-    <h2><strong>It's been eight years... I think it's time</strong></h2>
-    <p>In America, reunions are practically built into the culture, like 
-        it's just expected that you'll go back and see everyone. Whereas
-        the UK, that's not really a thing. We leave school and that's kind
-        of just it. No structure, no expectation, no one organising it so 
-        it just doesn't happen. People we spent every day with for five years 
-        become people we used to know.
-    </p>
-    <h2>
-        <strong>Why this matters to me</strong> 
-    </h2>
-    <p>
-        <strong>Secondary was a time when life just felt simple.</strong> We 
-        were young, energetic and discovering ourselves. I found myself 
-        wishing I could experience that feeling again. That's why I built 
-        this: A space for us to reconnect, relive the memories that made us 
-        who we are and create new ones together. We went from spending everyday 
-        with people, to barely recognising each other. We didn't end year 11 
-        on a good path, so let's come together and make this a legacy!
-    </p>
-    <h2>
-        <strong>Who it's for?</strong>
-    </h2>
-    <p>
-        This is strictly for <strong>Trinity School Bexley, Year 11, Class of 
-            2018. 
-        </strong> Those who remember the legendary video (I'll back it out now) 
-        and want to know what he's been up to with his life. Some thought: Jail, 
-        unemployed, homeless or dead - to those curious, I encourage you to come 
-        find out.
-    </p>
-    <h2>
-        <strong>Next steps</strong>
-    </h2>
-    <p>
-        <strong>Sign up now</strong> to be a part of this experience, drop your 
-        name and email below so we know you're in and when the date's locked, 
-        you'll be the first to hear.
-    </p>
+
+<div class="loader" id="loader" aria-hidden="true">
+  <div class="loader__mark">T<span>/</span>18</div>
+  <div class="loader__bar"><i></i></div>
+</div>
+
+<a class="skip" href="#register">Skip to sign up</a>
+
+<main>
+
+  <!-- ─────────────────────────── HERO ─────────────────────────── -->
+  <section class="hero" id="hero">
+    <div class="hero__bg" aria-hidden="true">
+      <span class="hero__ghost">2018</span>
+      <span class="hero__glow"></span>
+    </div>
+
+    <div class="hero__inner">
+      <p class="eyebrow" data-reveal>The Reunion</p>
+
+      <h1 class="hero__title">
+        <span class="line" data-reveal>Trinity School Bexley.</span>
+        <span class="line" data-reveal>Year 11.</span>
+        <span class="line accent" data-reveal>Class of 2018.</span>
+      </h1>
+
+      <p class="hero__sub" data-reveal><strong>It's been eight years... I think it's time</strong></p>
+
+      <div class="hero__actions" data-reveal>
+        <a class="btn btn--primary" href="#register" data-magnetic>
+          <span>Sign up — it's free</span>
+        </a>
+        <p class="hero__note">No date yet. Sign up and you'll be the first to hear.</p>
+      </div>
+    </div>
+
+    <div class="scrollcue" aria-hidden="true"><span></span></div>
+  </section>
+
+  <!-- ─────────────────────────── STORY ─────────────────────────── -->
+  <section class="story" id="story">
+
+    <article class="block">
+      <p class="block__body" data-split>In America, reunions are practically built into the culture, like it's just expected that you'll go back and see everyone. Whereas the UK, that's not really a thing. We leave school and that's kind of just it. No structure, no expectation, no one organising it so it just doesn't happen. People we spent every day with for five years become people we used to know.</p>
+    </article>
+
+    <article class="block">
+      <h2 class="block__title" data-split>Why this matters to me</h2>
+      <p class="block__body" data-split><strong>Secondary was a time when life just felt simple.</strong> We were young, energetic and discovering ourselves. I found myself wishing I could experience that feeling again. That's why I built this: A space for us to reconnect, relive the memories that made us who we are and create new ones together. We went from spending everyday with people, to barely recognising each other. We didn't end year 11 on a good path, so let's come together and make this a legacy!</p>
+    </article>
+
+    <article class="block">
+      <h2 class="block__title" data-split>Who it's for?</h2>
+      <p class="block__body" data-split>This is strictly for <strong>Trinity School Bexley, Year 11, Class of 2018.</strong> Those who remember the legendary video (I'll back it out now) and want to know what he's been up to with his life. Some thought: Jail, unemployed, homeless or dead - to those curious, I encourage you to come find out.</p>
+    </article>
+
+  </section>
+
+  <!-- ──────────────────── THE 3D MEMORY CORRIDOR ──────────────────── -->
+  <section class="corridor" id="corridor" aria-label="The memories">
+    <div class="corridor__stage">
+      <canvas class="corridor__canvas" id="corridor-canvas" aria-hidden="true"></canvas>
+
+      <!-- Shown when WebGL is unavailable, data saver is on, or motion is reduced -->
+      <div class="corridor__fallback" id="corridor-fallback" aria-hidden="true">
+        <i style="--x:-38%;--y:-24%;--r:-7deg;--d:.0s"></i>
+        <i style="--x: 32%;--y:-30%;--r: 5deg;--d:.1s"></i>
+        <i style="--x:-26%;--y: 22%;--r: 8deg;--d:.2s"></i>
+        <i style="--x: 40%;--y: 18%;--r:-6deg;--d:.3s"></i>
+        <i style="--x:  2%;--y: -4%;--r: 2deg;--d:.4s"></i>
+      </div>
+
+      <div class="corridor__copy">
+        <p class="corridor__kicker" data-reveal>Eight years of frames nobody's looked at</p>
+        <h2 class="corridor__title" data-reveal>The memories that<br /><em>made us who we are</em></h2>
+        <p class="corridor__sub" data-reveal>Every person who signs up adds one. They go up on the wall.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────── COUNTER ─────────────────────────── -->
+  <section class="counter" id="counter">
+    <div class="counter__inner">
+      <p class="counter__label" data-reveal>Signed up so far</p>
+
+      <p class="counter__number" id="counter-number" data-count="0" aria-live="polite">
+        <span id="counter-value">—</span>
+      </p>
+
+      <!-- Appears once SIGNUP_TARGET is set in app.js (after venue break-even is known) -->
+      <div class="counter__progress" id="counter-progress" hidden>
+        <div class="counter__track"><div class="counter__fill" id="counter-fill"></div></div>
+        <p class="counter__goal" id="counter-goal"></p>
+      </div>
+
+      <p class="counter__hint" id="counter-hint" data-reveal>Every single one makes this more likely to actually happen.</p>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────── REGISTER ─────────────────────────── -->
+  <section class="register" id="register">
+    <div class="register__inner">
+
+      <h2 class="register__title" data-reveal>Next steps</h2>
+      <p class="register__intro" data-reveal><strong>Sign up now</strong> to be a part of this experience, drop your name and email below so we know you're in and when the date's locked, you'll be the first to hear.</p>
+
+      <form class="form" id="signup-form" novalidate>
+
+        <div class="form__row">
+          <div class="field">
+            <label for="first_name">First name</label>
+            <input id="first_name" name="first_name" type="text" autocomplete="given-name"
+                   maxlength="60" required placeholder="Jordan" />
+            <p class="field__error" data-error-for="first_name"></p>
+          </div>
+
+          <div class="field">
+            <label for="last_name">Last name</label>
+            <input id="last_name" name="last_name" type="text" autocomplete="family-name"
+                   maxlength="60" required placeholder="Okafor" />
+            <p class="field__error" data-error-for="last_name"></p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email"
+                 inputmode="email" maxlength="254" required placeholder="you@email.com" />
+          <p class="field__hint">Only used to tell you the date. Nothing else, ever.</p>
+          <p class="field__error" data-error-for="email"></p>
+        </div>
+
+        <div class="field">
+          <label for="memory">What do you remember most? <span class="opt">optional</span></label>
+          <textarea id="memory" name="memory" rows="3" maxlength="1000"
+                    placeholder="A moment, a lesson, a teacher, that one thing everyone still talks about..."></textarea>
+          <p class="field__hint"><span id="memory-count">0</span>/1000 — the good ones go on the memories wall.</p>
+          <p class="field__error" data-error-for="memory"></p>
+        </div>
+
+        <div class="field field--check">
+          <label class="check">
+            <input id="confirmed_year_group" name="confirmed_year_group" type="checkbox" required />
+            <span class="check__box" aria-hidden="true"></span>
+            <span class="check__text">I was in <strong>Year 11 at Trinity School Bexley in 2018</strong></span>
+          </label>
+          <p class="field__error" data-error-for="confirmed_year_group"></p>
+        </div>
+
+        <!-- Honeypot: real people never see or fill this -->
+        <div class="hp" aria-hidden="true">
+          <label for="website">Website</label>
+          <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <button class="btn btn--primary btn--full" type="submit" id="submit-btn" data-magnetic>
+          <span class="btn__label">Count me in</span>
+          <span class="btn__spinner" aria-hidden="true"></span>
+        </button>
+
+        <p class="form__status" id="form-status" role="status" aria-live="polite"></p>
+      </form>
+
+      <!-- Swapped in on success -->
+      <div class="success" id="success" hidden>
+        <div class="success__tick" aria-hidden="true">
+          <svg viewBox="0 0 52 52"><path d="M14 27l8 8 16-18" /></svg>
+        </div>
+        <h3 class="success__title" id="success-title">You're in.</h3>
+        <p class="success__body">
+          That's you on the list. When the date's locked, you'll hear from me before anyone else.
+        </p>
+        <p class="success__share">
+          Now the useful bit — <strong>send this to one person</strong> from the year who'd want to know.
+        </p>
+        <div class="success__actions">
+          <a class="btn btn--primary" id="share-whatsapp" href="#" rel="noopener">Share on WhatsApp</a>
+          <button class="btn btn--ghost" id="share-copy" type="button">Copy link</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>Trinity School Bexley · Year 11 · Class of 2018</p>
+    <p class="footer__small">Built by one of us. Your details are never shared or sold.</p>
+  </footer>
+
+</main>
+
+<!-- Data layer: plain fetch, zero dependencies. Must work even if everything below fails. -->
+<script src="app.js"></script>
+
+<!-- Motion layer: strictly decorative, loaded after and isolated from the form. -->
+<script defer src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script defer src="motion.js"></script>
+
 </body>
 </html>
