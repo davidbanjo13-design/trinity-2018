@@ -65,6 +65,59 @@
     });
   }
 
+  /* ════════════════════════════ ANALYTICS ════════════════════════════
+     First-party, no cookies, no device storage, no personal data.
+
+     SESSION_ID is generated in memory on each page load and forgotten when the
+     tab closes. Nothing is written to localStorage, sessionStorage or a cookie,
+     which is precisely why this site needs no cookie banner.
+
+     Every call here is fire-and-forget and swallows its own errors. Analytics
+     must never be able to interfere with a signup. */
+
+  var SESSION_ID = (function () {
+    try {
+      if (window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
+      if (window.crypto && window.crypto.getRandomValues) {
+        var b = new Uint8Array(16);
+        window.crypto.getRandomValues(b);
+        b[6] = (b[6] & 0x0f) | 0x40;
+        b[8] = (b[8] & 0x3f) | 0x80;
+        var h = Array.prototype.map.call(b, function (x) {
+          return ('0' + x.toString(16)).slice(-2);
+        }).join('');
+        return h.slice(0, 8) + '-' + h.slice(8, 12) + '-' + h.slice(12, 16) +
+               '-' + h.slice(16, 20) + '-' + h.slice(20);
+      }
+    } catch (e) { /* fall through */ }
+    return null; // no usable randomness: log nothing rather than log something fake
+  })();
+
+  var tracked = {};
+
+  function track(name, once) {
+    try {
+      if (!SESSION_ID) return;
+      if (once) {
+        if (tracked[name]) return;
+        tracked[name] = true;
+      }
+
+      fetch(REST + '/events', {
+        method: 'POST',
+        headers: Object.assign({}, HEADERS, { 'Prefer': 'return=minimal' }),
+        body: JSON.stringify({
+          name: name,
+          session_id: SESSION_ID,
+          referrer: (document.referrer || '').slice(0, 300) || null,
+          path: (location.pathname || '/').slice(0, 200),
+          screen_w: window.innerWidth || null
+        }),
+        keepalive: true // survives the page being closed mid-request
+      }).catch(function () { /* never surfaces */ });
+    } catch (e) { /* never surfaces */ }
+  }
+
   /* ════════════════════════════ COUNTER ════════════════════════════ */
 
   function renderCount(n) {
@@ -156,6 +209,7 @@
     if (!grid.children.length) { section.hidden = true; return; }
 
     section.hidden = false;
+    track('wall_view', true);
 
     // Two frames so the element is laid out before the transition starts
     requestAnimationFrame(function () {
@@ -284,6 +338,7 @@
 
     setLoading(true);
     setStatus('', '');
+    track('form_submit');
 
     requestWithRetry('/signups', {
       method: 'POST',
@@ -291,12 +346,13 @@
       body: data
     })
       .then(function (res) {
-        if (res.status === 201) { showSuccess(data.first_name); return; }
+        if (res.status === 201) { track('form_success'); showSuccess(data.first_name); return; }
 
         return res.json().then(function (body) { return body; }, function () { return {}; })
           .then(function (body) {
             if (res.status === 409 || body.code === '23505') {
               // Already registered. Not an error worth alarming anyone about.
+              track('form_duplicate');
               setStatus("You're already on the list — nothing more to do. See you there.", 'ok');
               return;
             }
@@ -304,10 +360,12 @@
               setError('email', "That email was rejected as invalid — mind checking it?");
               return;
             }
+            track('form_error');
             setStatus("Something went wrong saving that. Try again in a moment, or message me directly.", 'error');
           });
       })
       .catch(function () {
+        track('form_error');
         setStatus("Couldn't reach the server — check your connection and try once more.", 'error');
       })
       .finally(function () { setLoading(false); });
@@ -318,6 +376,7 @@
   function initShare() {
     var wa = $('share-whatsapp');
     if (wa) {
+      wa.addEventListener('click', function () { track('share_click'); });
       wa.href = 'https://wa.me/?text=' + encodeURIComponent(SHARE_TEXT + ' ' + SHARE_URL);
       wa.target = '_blank';
     }
@@ -325,6 +384,7 @@
     var copy = $('share-copy');
     if (copy) {
       copy.addEventListener('click', function () {
+        track('share_click');
         var done = function () {
           copy.textContent = 'Link copied';
           setTimeout(function () { copy.textContent = 'Copy link'; }, 2200);
@@ -367,7 +427,15 @@
       });
     }
 
+    // First interaction with any form field, once per page load
+    if (form) {
+      ['focusin', 'input'].forEach(function (evt) {
+        form.addEventListener(evt, function () { track('form_start', true); }, { once: false });
+      });
+    }
+
     initShare();
+    track('page_view');
     loadCount();
     loadMemories();
   }

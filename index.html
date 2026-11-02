@@ -7,6 +7,13 @@
 <meta name="description" content="It's been eight years. A reunion for Trinity School Bexley, Year 11, Class of 2018. Sign up free and you'll be first to hear when the date is locked." />
 <meta name="theme-color" content="#07080B" />
 
+<!-- This is for one year group, shared by link. Keeping it out of search keeps
+     real names and memories off Google permanently.
+     Note: robots.txt deliberately ALLOWS crawling. A crawler blocked there can
+     never read this tag, and Google can still list a blocked URL it finds via a
+     link. Letting it fetch and read "noindex" is what actually keeps it out. -->
+<meta name="robots" content="noindex, nofollow" />
+
 <!-- Share card: WhatsApp / iMessage / socials. Designed image lands with the memories wall. -->
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://trinity-2018.netlify.app/" />
@@ -248,6 +255,9 @@
   <footer class="footer">
     <p>Trinity School Bexley · Year 11 · Class of 2018</p>
     <p class="footer__small">Built by one of us. Your details are never shared or sold.</p>
+    <p class="footer__small">
+      <a class="footer__link" href="privacy.html">What I do with your details</a>
+    </p>
   </footer>
 
 </main>

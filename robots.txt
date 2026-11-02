@@ -1,0 +1,14 @@
+# This site is for one school year group and is shared by link.
+# It is kept OUT of search results by the "noindex" meta tag on every page
+# and the X-Robots-Tag header in _headers - NOT by blocking crawlers here.
+#
+# Crawling is deliberately allowed. A crawler blocked in robots.txt can never
+# read the noindex tag, and Google will still list a blocked URL it discovers
+# through a link. Letting it fetch the page and read "noindex" is what actually
+# keeps it out of results.
+#
+# It also means WhatsApp, iMessage and the other link-preview scrapers can
+# still fetch og.jpg, which is how the share card renders.
+
+User-agent: *
+Allow: /
