@@ -13,9 +13,17 @@
 <meta property="og:site_name" content="Trinity 2018 Reunion" />
 <meta property="og:title" content="Trinity School Bexley. Year 11. Class of 2018." />
 <meta property="og:description" content="It's been eight years... I think it's time. Sign up free — you'll be the first to hear when the date's locked." />
+<!-- Absolute URL required: preview scrapers do not resolve relative paths.
+     Regenerate from og-card.html - instructions are in that file. -->
+<meta property="og:image" content="https://trinity-2018.netlify.app/og.jpg" />
+<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Trinity School Bexley. Year 11. Class of 2018. It's been eight years... I think it's time." />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Trinity School Bexley. Year 11. Class of 2018." />
 <meta name="twitter:description" content="It's been eight years... I think it's time." />
+<meta name="twitter:image" content="https://trinity-2018.netlify.app/og.jpg" />
 
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2307080B'/><text y='70' x='50' text-anchor='middle' font-family='Georgia,serif' font-size='52' fill='%23E9B949'>T</text></svg>" />
 
@@ -121,6 +129,18 @@
     </div>
   </section>
 
+  <!-- ─────────────────────── THE MEMORIES WALL ───────────────────────
+       Stays hidden until there is something approved to show. An empty wall
+       looks dead and costs more than it gains. -->
+  <section class="wall" id="wall" hidden>
+    <div class="wall__inner">
+      <p class="wall__kicker" data-reveal>The memories wall</p>
+      <h2 class="wall__title" data-reveal>What we actually remember</h2>
+      <div class="wall__grid" id="wall-grid"></div>
+      <p class="wall__foot" data-reveal>Add yours when you sign up.</p>
+    </div>
+  </section>
+
   <!-- ─────────────────────────── COUNTER ─────────────────────────── -->
   <section class="counter" id="counter">
     <div class="counter__inner">
@@ -177,7 +197,7 @@
           <label for="memory">What do you remember most? <span class="opt">optional</span></label>
           <textarea id="memory" name="memory" rows="3" maxlength="1000"
                     placeholder="A moment, a lesson, a teacher, that one thing everyone still talks about..."></textarea>
-          <p class="field__hint"><span id="memory-count">0</span>/1000 — the good ones go on the memories wall.</p>
+          <p class="field__hint"><span id="memory-count">0</span>/1000 — if I put yours on the public memories wall, it shows as your first name and last initial (e.g. Jordan O.). Never your email.</p>
           <p class="field__error" data-error-for="memory"></p>
         </div>
 

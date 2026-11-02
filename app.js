@@ -117,6 +117,59 @@
     if (section) section.setAttribute('data-unavailable', 'true');
   }
 
+  /* ════════════════════════ MEMORIES WALL ════════════════════════
+     Feed comes from approved_memories(), which can only ever return a display
+     name, the memory text and a date. Email and full surname are unreachable
+     through it by construction, not by filtering here. */
+
+  function renderMemories(rows) {
+    var section = $('wall');
+    var grid = $('wall-grid');
+    if (!section || !grid) return;
+
+    if (!rows || !rows.length) { section.hidden = true; return; }
+
+    grid.textContent = '';
+
+    rows.forEach(function (row, i) {
+      if (!row || !row.memory) return;
+
+      var card = document.createElement('figure');
+      card.className = 'memory';
+      card.style.transitionDelay = Math.min(i * 70, 700) + 'ms';
+
+      var quote = document.createElement('blockquote');
+      quote.className = 'memory__text';
+      // textContent, never innerHTML. This is text other people wrote.
+      quote.textContent = row.memory;
+
+      var name = document.createElement('figcaption');
+      name.className = 'memory__name';
+      name.textContent = row.display_name || '';
+
+      card.appendChild(quote);
+      card.appendChild(name);
+      grid.appendChild(card);
+    });
+
+    // Every row could have been filtered out above
+    if (!grid.children.length) { section.hidden = true; return; }
+
+    section.hidden = false;
+
+    // Two frames so the element is laid out before the transition starts
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { section.classList.add('is-ready'); });
+    });
+  }
+
+  function loadMemories() {
+    return requestWithRetry('/rpc/approved_memories', { method: 'POST', body: {} })
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(renderMemories)
+      .catch(function () { /* wall just stays hidden; nothing else is affected */ });
+  }
+
   /* ════════════════════════════ FORM ════════════════════════════ */
 
   var form = $('signup-form');
@@ -316,6 +369,7 @@
 
     initShare();
     loadCount();
+    loadMemories();
   }
 
   if (document.readyState === 'loading') {

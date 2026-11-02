@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="robots" content="noindex, nofollow" />
+<title>OG card source — Trinity 2018</title>
+<!--
+  Source for og.png, the WhatsApp/iMessage/social preview image.
+  Not linked from anywhere; it exists so the card can be regenerated.
+
+  To rebuild after editing:
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+      --headless --disable-gpu --hide-scrollbars --virtual-time-budget=6000 \
+      --window-size=1200,630 --screenshot=og.png og-card.html
+
+  Must stay exactly 1200x630 - that is the aspect ratio WhatsApp and
+  iMessage crop to. Keep text well inside the edges; some clients crop.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;600&display=swap" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+
+  body {
+    position: relative;
+    background: #07080B;
+    color: #F3F4F6;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 86px;
+  }
+
+  .ghost {
+    position: absolute;
+    right: -40px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 440px;
+    line-height: 0.8;
+    color: rgba(255, 255, 255, 0.028);
+    letter-spacing: -0.04em;
+  }
+
+  .glow {
+    position: absolute;
+    left: -10%;
+    top: -60%;
+    width: 900px;
+    height: 900px;
+    background: radial-gradient(circle, rgba(233,185,73,0.13) 0%, rgba(233,185,73,0) 62%);
+  }
+
+  .grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .inner { position: relative; z-index: 2; }
+
+  .eyebrow {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #E9B949;
+    margin-bottom: 30px;
+  }
+
+  h1 {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-weight: 400;
+    font-size: 86px;
+    line-height: 0.99;
+    letter-spacing: -0.02em;
+  }
+  h1 .gold { color: #E9B949; font-style: italic; }
+
+  .sub {
+    margin-top: 34px;
+    font-size: 27px;
+    color: #9AA1AD;
+  }
+
+  .foot {
+    position: absolute;
+    left: 86px;
+    bottom: 54px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 18px;
+    color: #646B78;
+    z-index: 2;
+  }
+  .pill {
+    padding: 11px 22px;
+    background: #E9B949;
+    color: #0A0A0A;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 18px;
+  }
+</style>
+</head>
+<body>
+  <div class="glow"></div>
+  <div class="ghost">2018</div>
+  <div class="grain"></div>
+
+  <div class="inner">
+    <div class="eyebrow">The Reunion</div>
+    <h1>
+      Trinity School Bexley.<br />
+      Year 11. <span class="gold">Class of 2018.</span>
+    </h1>
+    <p class="sub">It's been eight years... I think it's time</p>
+  </div>
+
+  <div class="foot">
+    <span class="pill">Sign up — it's free</span>
+    <span>trinity-2018.netlify.app</span>
+  </div>
+</body>
+</html>

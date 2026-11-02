@@ -421,6 +421,85 @@ html:not(.motion-on) .corridor__stage {
   font-size: 1rem;
 }
 
+/* ──────────────────────────── Memories wall ────────────────────────────
+   No `display` is declared on .wall, so the `hidden` attribute still works
+   and the section stays out of the page until there is something approved. */
+
+.wall {
+  padding: clamp(5rem, 13vw, 9rem) var(--page);
+  border-top: 1px solid var(--line);
+}
+.wall__inner { max-width: var(--max); margin: 0 auto; }
+
+.wall__kicker {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-align: center;
+}
+.wall__title {
+  margin-top: 1rem;
+  font-family: var(--display);
+  font-size: clamp(2rem, 7vw, 3.5rem);
+  line-height: 1.08;
+  color: #fff;
+  text-align: center;
+}
+
+/* CSS columns give a masonry feel with no library and no layout thrash */
+.wall__grid {
+  margin-top: clamp(2.5rem, 6vw, 4rem);
+  columns: 1;
+  column-gap: 1.25rem;
+}
+@media (min-width: 40rem) { .wall__grid { columns: 2; } }
+@media (min-width: 64rem) { .wall__grid { columns: 3; } }
+
+.memory {
+  break-inside: avoid;
+  margin: 0 0 1.25rem;
+  padding: 1.6rem 1.5rem 1.3rem;
+  background: var(--ink-raised);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  opacity: 0;
+  transform: translateY(1rem);
+  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease), border-color 0.3s;
+}
+.wall.is-ready .memory { opacity: 1; transform: none; }
+.memory:hover { border-color: var(--line-strong); }
+
+.memory__text {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(1.1rem, 3.4vw, 1.3rem);
+  line-height: 1.45;
+  color: var(--text);
+  white-space: pre-wrap;      /* keep the line breaks people actually typed */
+  overflow-wrap: anywhere;    /* someone will paste a 400-character word */
+}
+.memory__text::before { content: '\201C'; color: var(--gold); }
+.memory__text::after  { content: '\201D'; color: var(--gold); }
+
+.memory__name {
+  margin-top: 1.1rem;
+  font-family: var(--sans);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.wall__foot {
+  margin-top: 2.5rem;
+  text-align: center;
+  color: var(--faint);
+  font-size: 0.95rem;
+}
+
 /* ─────────────────────────────── Counter ─────────────────────────────── */
 
 .counter {
@@ -673,7 +752,8 @@ textarea { resize: vertical; min-height: 6rem; }
     scroll-behavior: auto !important;
   }
   .motion-on [data-reveal],
-  .motion-on .word {
+  .motion-on .word,
+  .memory {
     opacity: 1 !important;
     transform: none !important;
   }
