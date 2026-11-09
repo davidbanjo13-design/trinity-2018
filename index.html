@@ -37,6 +37,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" />
+<link rel="preload" as="image" href="hero-800.jpg"
+      imagesrcset="hero-560.jpg 560w, hero-800.jpg 800w, hero-1184.jpg 1184w"
+      imagesizes="(min-width: 64rem) 62vw, 100vw" />
 <link rel="stylesheet" href="styles.css" />
 
 <script>
@@ -52,6 +55,22 @@
     var l = document.getElementById('loader');
     if (l) l.className += ' is-done';
   }, 2500);
+
+  /* The hero photo resolves from blurred to sharp once it has decoded - a
+     memory coming into focus. Gated on .js-on, so with JS off the image is
+     simply sharp from the start rather than stuck behind a blur. */
+  function heroReady() {
+    var m = document.getElementById('hero-media');
+    if (m && m.className.indexOf('is-loaded') === -1) m.className += ' is-loaded';
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    var img = document.querySelector('.hero__img');
+    if (!img) return;
+    if (img.complete && img.naturalWidth) { heroReady(); return; }
+    img.addEventListener('load', heroReady);
+    img.addEventListener('error', heroReady);   // never leave it blurred
+    setTimeout(heroReady, 4000);                // failsafe
+  });
 })();
 </script>
 </head>
@@ -69,7 +88,14 @@
   <!-- ─────────────────────────── HERO ─────────────────────────── -->
   <section class="hero" id="hero">
     <div class="hero__bg" aria-hidden="true">
-      <span class="hero__ghost">2018</span>
+      <picture class="hero__media" id="hero-media">
+        <img class="hero__img"
+             src="hero-800.jpg"
+             srcset="hero-560.jpg 560w, hero-800.jpg 800w, hero-1184.jpg 1184w"
+             sizes="(min-width: 64rem) 62vw, 100vw"
+             alt="" decoding="async" fetchpriority="high" />
+      </picture>
+      <span class="hero__scrim"></span>
       <span class="hero__glow"></span>
     </div>
 

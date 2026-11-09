@@ -173,9 +173,9 @@
 
     if (reduced) return;
 
-    // Depth: ghost year drifts slower than the page
-    gsap.to('.hero__ghost', {
-      yPercent: 22,
+    // Depth: the photo drifts slower than the page as you scroll away from it
+    gsap.to('.hero__media', {
+      yPercent: 12,
       ease: 'none',
       scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
     });

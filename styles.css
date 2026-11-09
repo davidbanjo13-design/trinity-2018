@@ -170,18 +170,96 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
 
 .hero__bg { position: absolute; inset: 0; pointer-events: none; }
 
-.hero__ghost {
+/* ── Hero photograph ───────────────────────────────────────────────────
+   A portrait source behind a full-bleed hero, so the crop is controlled by
+   object-position rather than left to chance. Both the man and the mirror
+   have to survive it - the picture means nothing with only one of them. */
+
+.hero__media {
   position: absolute;
-  left: 50%;
-  top: 46%;
-  transform: translate(-50%, -50%);
-  font-family: var(--display);
-  font-size: clamp(14rem, 46vw, 40rem);
-  line-height: 0.8;
-  color: rgba(255, 255, 255, 0.022);
-  letter-spacing: -0.04em;
-  user-select: none;
-  white-space: nowrap;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+}
+
+.hero__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 55% 38%;
+}
+
+/* The blur-in is opt-in via .js-on, so with JS off the photo is simply
+   sharp from first paint instead of stranded behind a filter. */
+.js-on .hero__img {
+  opacity: 0;
+  transform: scale(1.07);
+  filter: blur(26px) saturate(0.5) brightness(0.75);
+  transition:
+    opacity 1.2s var(--ease),
+    transform 2.4s var(--ease),
+    filter 2s var(--ease);
+  will-change: opacity, transform, filter;
+}
+
+.js-on .hero__media.is-loaded .hero__img {
+  opacity: 1;
+  transform: scale(1);
+  filter: blur(0px) saturate(1) brightness(1);
+}
+
+/* A slow drift so the hero is never completely still */
+@media (prefers-reduced-motion: no-preference) {
+  .js-on .hero__media.is-loaded .hero__img {
+    animation: heroDrift 30s ease-in-out 2.6s infinite alternate;
+  }
+}
+@keyframes heroDrift {
+  from { transform: scale(1)     translate3d(0, 0, 0); }
+  to   { transform: scale(1.055) translate3d(-1.4%, -1.6%, 0); }
+}
+
+/* Legibility, not decoration. Without this the white and gold type dies on
+   the bright window and the yellow corridor wall. */
+.hero__scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom,
+      rgba(7, 8, 11, 0.94) 0%,
+      rgba(7, 8, 11, 0.58) 30%,
+      rgba(7, 8, 11, 0.74) 62%,
+      rgba(7, 8, 11, 0.97) 100%),
+    radial-gradient(125% 85% at 68% 42%,
+      rgba(7, 8, 11, 0) 30%,
+      rgba(7, 8, 11, 0.9) 100%);
+}
+
+@media (min-width: 64rem) {
+  /* On a wide screen the photo moves to the right and dissolves into the
+     page, leaving the headline a clean dark field to sit on. */
+  .hero__media {
+    left: auto;
+    right: 0;
+    width: 62%;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 36%);
+            mask-image: linear-gradient(to right, transparent 0%, #000 36%);
+  }
+  .hero__img { object-position: 52% 30%; }
+  .hero__scrim {
+    background:
+      linear-gradient(to right,
+        rgba(7, 8, 11, 0.97) 0%,
+        rgba(7, 8, 11, 0.90) 30%,
+        rgba(7, 8, 11, 0.45) 58%,
+        rgba(7, 8, 11, 0.30) 100%),
+      linear-gradient(to bottom,
+        rgba(7, 8, 11, 0.55) 0%,
+        rgba(7, 8, 11, 0) 28%,
+        rgba(7, 8, 11, 0) 62%,
+        rgba(7, 8, 11, 0.92) 100%);
+  }
 }
 
 .hero__glow {
@@ -238,7 +316,19 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
   align-items: flex-start;
   gap: 1rem;
 }
-.hero__note { font-size: 0.875rem; color: var(--faint); }
+/* Was --faint, which was fine on flat black but too dim once a photograph
+   sits behind it. */
+.hero__note { font-size: 0.875rem; color: var(--muted); }
+
+/* Insurance for type over a photo: the crop shifts with viewport, so a bright
+   patch can land under the text on some screens and not others. Costs nothing
+   on the dark areas and saves legibility on the light ones. */
+.hero .eyebrow,
+.hero__title,
+.hero__sub,
+.hero__note {
+  text-shadow: 0 2px 30px rgba(7, 8, 11, 0.65);
+}
 
 .scrollcue {
   position: absolute;
@@ -756,6 +846,12 @@ textarea { resize: vertical; min-height: 6rem; }
   .memory {
     opacity: 1 !important;
     transform: none !important;
+  }
+  .js-on .hero__img {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    animation: none !important;
   }
   .corridor { height: auto; }
   .corridor__stage { position: relative; height: auto; min-height: 70svh; padding: 5rem 0; }
