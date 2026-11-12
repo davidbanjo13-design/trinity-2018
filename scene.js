@@ -102,6 +102,7 @@ export async function createCorridor(canvas) {
       (Math.random() - 0.5) * 0.22
     );
 
+    group.userData.base = { w: w, h: h };
     group.userData.drift = {
       speed: 0.12 + Math.random() * 0.22,
       phase: Math.random() * Math.PI * 2,
@@ -151,6 +152,9 @@ export async function createCorridor(canvas) {
   window.addEventListener('resize', onResize);
 
   /* ── Loop ──────────────────────────────────────────────────────────── */
+  const ownedTextures = [];
+  const ownedMaterials = [];
+
   let progress = 0;
   let targetProgress = 0;
   let active = true;
@@ -189,6 +193,55 @@ export async function createCorridor(canvas) {
 
   /* ── Public surface ────────────────────────────────────────────────── */
   return {
+    /* Fills the frames with approved photos. Called from motion.js once the
+       wall feed has resolved; until then the frames stay deliberately empty.
+
+       Photos are cycled, but only across three frames per photo - with a
+       single photo, filling all 34 frames with the same face would read as a
+       bug rather than a design. */
+    setPhotos(urls) {
+      if (disposed || !urls || !urls.length) return;
+
+      const loader = new THREE.TextureLoader();
+      const fillCount = Math.min(frames.length, urls.length * 3);
+
+      for (let i = 0; i < fillCount; i++) {
+        const group = frames[i];
+        const url = urls[i % urls.length];
+
+        loader.load(url, (texture) => {
+          if (disposed) return;
+
+          texture.colorSpace = THREE.SRGBColorSpace;
+
+          const im = texture.image;
+          const aspect = (im && im.width && im.height) ? im.width / im.height : 1;
+
+          // Keep roughly the frame's footprint, but take the photo's shape
+          const base = group.userData.base;
+          const area = base.w * base.h;
+          const h = Math.sqrt(area / aspect);
+          const w = h * aspect;
+
+          const border = group.children[0];
+          const pane = group.children[1];
+
+          const mat = new THREE.MeshBasicMaterial({
+            map: texture,
+            fog: true,
+            toneMapped: false
+          });
+
+          border.scale.set(w, h, 1);
+          pane.material = mat;
+          pane.scale.set(w * 0.93, h * 0.93, 1);
+
+          ownedTextures.push(texture);
+          ownedMaterials.push(mat);
+        }, undefined, () => { /* one bad photo must not break the scene */ });
+      }
+    },
+
     setProgress(p) {
       targetProgress = Math.max(0, Math.min(1, p));
     },
@@ -215,6 +268,8 @@ export async function createCorridor(canvas) {
       paneMat.dispose();
       dustGeo.dispose();
       dustMat.dispose();
+      ownedTextures.forEach((t) => t.dispose());
+      ownedMaterials.forEach((m) => m.dispose());
       renderer.dispose();
     }
   };

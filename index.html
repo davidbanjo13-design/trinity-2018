@@ -234,6 +234,33 @@
           <p class="field__error" data-error-for="memory"></p>
         </div>
 
+        <div class="field">
+          <label for="photos">Photos from back then <span class="opt">optional — up to 3</span></label>
+
+          <label class="drop" for="photos" id="drop">
+            <input id="photos" name="photos" type="file"
+                   accept="image/jpeg,image/png,image/webp" multiple />
+            <span class="drop__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h2.2a1.5 1.5 0 0 0 1.3-.75l.7-1.2A1.5 1.5 0 0 1 10 4.3h4a1.5 1.5 0 0 1 1.3.75l.7 1.2A1.5 1.5 0 0 0 17.3 7h2.2A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/>
+                <circle cx="12" cy="12.8" r="3.4"/>
+              </svg>
+            </span>
+            <span class="drop__title">Tap to add photos</span>
+            <span class="drop__hint">Anything from 2018 you've still got</span>
+          </label>
+
+          <div class="previews" id="photo-previews"></div>
+
+          <p class="field__hint">
+            Only add photos you're happy for the year group to see. Approved ones go on the wall
+            with your first name and last initial. Photos are resized in your browser before
+            they're sent, which strips any location data off them.
+          </p>
+          <p class="field__error" data-error-for="photos"></p>
+        </div>
+
         <div class="field field--check">
           <label class="check">
             <input id="confirmed_year_group" name="confirmed_year_group" type="checkbox" required />
@@ -266,6 +293,7 @@
         <p class="success__body">
           That's you on the list. When the date's locked, you'll hear from me before anyone else.
         </p>
+        <p class="success__photos" id="success-photos" hidden></p>
         <p class="success__share">
           Now the useful bit — <strong>send this to one person</strong> from the year who'd want to know.
         </p>

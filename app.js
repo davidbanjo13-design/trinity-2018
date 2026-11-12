@@ -171,57 +171,341 @@
   }
 
   /* ════════════════════════ MEMORIES WALL ════════════════════════
-     Feed comes from approved_memories(), which can only ever return a display
-     name, the memory text and a date. Email and full surname are unreachable
-     through it by construction, not by filtering here. */
+     Two feeds, one grid. approved_memories() returns text; approved_photos()
+     returns a display name, caption and storage path. Neither can return an
+     email or a full surname - that is enforced in the functions, not here.
 
-  function renderMemories(rows) {
+     Photos live in a PRIVATE bucket, so they cannot be dropped into an <img
+     src>. Each one is fetched with the public key (storage RLS only releases
+     it once approved), turned into a blob URL, and rendered from that. An
+     unapproved photo is unreadable even by someone holding its exact URL. */
+
+  var PHOTO_BUCKET = 'memories';
+  var photoObjectUrls = [];
+
+  function storageUrl(path) {
+    return SUPABASE_URL + '/storage/v1/object/' + PHOTO_BUCKET + '/' + encodeURIComponent(path);
+  }
+
+  function fetchPhotoUrl(path) {
+    return fetch(storageUrl(path), {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    }).then(function (res) {
+      if (!res.ok) throw new Error('photo ' + res.status);
+      return res.blob();
+    }).then(function (blob) {
+      var url = URL.createObjectURL(blob);
+      photoObjectUrls.push(url);
+      return url;
+    });
+  }
+
+  function photoCard(row, url) {
+    var card = document.createElement('figure');
+    card.className = 'memory memory--photo';
+
+    var frame = document.createElement('div');
+    frame.className = 'memory__frame';
+
+    var img = document.createElement('img');
+    img.className = 'memory__img';
+    img.src = url;
+    img.alt = row.caption ? String(row.caption) : 'A photo from 2018';
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    frame.appendChild(img);
+    card.appendChild(frame);
+
+    if (row.caption) {
+      var cap = document.createElement('figcaption');
+      cap.className = 'memory__caption';
+      cap.textContent = row.caption;   // textContent: other people wrote this
+      card.appendChild(cap);
+    }
+
+    var name = document.createElement('figcaption');
+    name.className = 'memory__name';
+    name.textContent = row.display_name || '';
+    card.appendChild(name);
+
+    return card;
+  }
+
+  function textCard(row) {
+    var card = document.createElement('figure');
+    card.className = 'memory';
+
+    var quote = document.createElement('blockquote');
+    quote.className = 'memory__text';
+    quote.textContent = row.memory;    // textContent: other people wrote this
+
+    var name = document.createElement('figcaption');
+    name.className = 'memory__name';
+    name.textContent = row.display_name || '';
+
+    card.appendChild(quote);
+    card.appendChild(name);
+    return card;
+  }
+
+  function renderWall(memories, photoPairs) {
     var section = $('wall');
     var grid = $('wall-grid');
     if (!section || !grid) return;
 
-    if (!rows || !rows.length) { section.hidden = true; return; }
+    var hasAny = (photoPairs && photoPairs.length) || (memories && memories.length);
+    if (!hasAny) { section.hidden = true; return; }
 
     grid.textContent = '';
+    var i = 0;
 
-    rows.forEach(function (row, i) {
-      if (!row || !row.memory) return;
-
-      var card = document.createElement('figure');
-      card.className = 'memory';
-      card.style.transitionDelay = Math.min(i * 70, 700) + 'ms';
-
-      var quote = document.createElement('blockquote');
-      quote.className = 'memory__text';
-      // textContent, never innerHTML. This is text other people wrote.
-      quote.textContent = row.memory;
-
-      var name = document.createElement('figcaption');
-      name.className = 'memory__name';
-      name.textContent = row.display_name || '';
-
-      card.appendChild(quote);
-      card.appendChild(name);
+    // Photos first - they are the reason anyone scrolls this far
+    (photoPairs || []).forEach(function (pair) {
+      var card = photoCard(pair.row, pair.url);
+      card.style.transitionDelay = Math.min(i++ * 70, 700) + 'ms';
       grid.appendChild(card);
     });
 
-    // Every row could have been filtered out above
+    (memories || []).forEach(function (row) {
+      if (!row || !row.memory) return;
+      var card = textCard(row);
+      card.style.transitionDelay = Math.min(i++ * 70, 700) + 'ms';
+      grid.appendChild(card);
+    });
+
     if (!grid.children.length) { section.hidden = true; return; }
 
     section.hidden = false;
     track('wall_view', true);
 
-    // Two frames so the element is laid out before the transition starts
     requestAnimationFrame(function () {
       requestAnimationFrame(function () { section.classList.add('is-ready'); });
     });
   }
 
-  function loadMemories() {
-    return requestWithRetry('/rpc/approved_memories', { method: 'POST', body: {} })
-      .then(function (res) { return res.ok ? res.json() : null; })
-      .then(renderMemories)
-      .catch(function () { /* wall just stays hidden; nothing else is affected */ });
+  function loadWall() {
+    var memories = requestWithRetry('/rpc/approved_memories', { method: 'POST', body: {} })
+      .then(function (res) { return res.ok ? res.json() : []; })
+      .catch(function () { return []; });
+
+    var photos = requestWithRetry('/rpc/approved_photos', { method: 'POST', body: {} })
+      .then(function (res) { return res.ok ? res.json() : []; })
+      .catch(function () { return []; })
+      .then(function (rows) {
+        if (!rows || !rows.length) return [];
+        // Settle individually: one unreadable photo must not sink the wall
+        return Promise.all(rows.map(function (row) {
+          return fetchPhotoUrl(row.storage_path)
+            .then(function (url) { return { row: row, url: url }; })
+            .catch(function () { return null; });
+        })).then(function (pairs) {
+          return pairs.filter(Boolean);
+        });
+      });
+
+    return Promise.all([memories, photos]).then(function (out) {
+      renderWall(out[0], out[1]);
+
+      // Hand the photos to the 3D corridor so its frames stop being empty.
+      // One-way, and entirely optional - motion.js may never have loaded.
+      try {
+        if (window.__trinityMotion && window.__trinityMotion.setCorridorPhotos) {
+          window.__trinityMotion.setCorridorPhotos(out[1].map(function (p) { return p.url; }));
+        }
+      } catch (e) { /* decoration only */ }
+    });
+  }
+
+  /* ════════════════════════ PHOTO UPLOAD ════════════════════════
+     Resizing happens in the browser before anything is sent. A phone photo is
+     3-6MB; this lands around 200-400KB, which is the difference between an
+     upload that finishes on mobile data and one that is abandoned.
+
+     Re-encoding through a canvas also drops every EXIF field, so GPS
+     coordinates from someone's camera roll never leave their device. */
+
+  var MAX_PHOTOS = 3;
+  var MAX_DIM = 1600;
+  var JPEG_QUALITY = 0.82;
+  var MAX_SOURCE_BYTES = 25 * 1024 * 1024;
+
+  var selectedPhotos = [];
+  var previewUrls = [];
+
+  function uuid() {
+    if (window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
+    var b = new Uint8Array(16);
+    window.crypto.getRandomValues(b);
+    b[6] = (b[6] & 0x0f) | 0x40;
+    b[8] = (b[8] & 0x3f) | 0x80;
+    var h = Array.prototype.map.call(b, function (x) {
+      return ('0' + x.toString(16)).slice(-2);
+    }).join('');
+    return h.slice(0, 8) + '-' + h.slice(8, 12) + '-' + h.slice(12, 16) +
+           '-' + h.slice(16, 20) + '-' + h.slice(20);
+  }
+
+  function downscale(file) {
+    return new Promise(function (resolve, reject) {
+      if (file.size > MAX_SOURCE_BYTES) { reject(new Error('too big')); return; }
+
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        var w = img.naturalWidth, h = img.naturalHeight;
+        if (!w || !h) { reject(new Error('decode')); return; }
+
+        var scale = Math.min(1, MAX_DIM / Math.max(w, h));
+        var canvas = document.createElement('canvas');
+        canvas.width = Math.round(w * scale);
+        canvas.height = Math.round(h * scale);
+
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(function (blob) {
+          if (blob) resolve(blob); else reject(new Error('encode'));
+        }, 'image/jpeg', JPEG_QUALITY);
+      };
+
+      img.onerror = function () {
+        URL.revokeObjectURL(url);
+        reject(new Error('decode'));
+      };
+
+      img.src = url;
+    });
+  }
+
+  function uploadPhoto(blob) {
+    var name = uuid() + '.jpg';
+    return fetch(storageUrl(name), {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'image/jpeg',
+        'x-upsert': 'false'
+      },
+      body: blob
+    }).then(function (res) {
+      if (!res.ok) throw new Error('upload ' + res.status);
+      return name;
+    });
+  }
+
+  function savePhotoRows(paths, first, last, caption) {
+    if (!paths.length) return Promise.resolve();
+    return request('/memory_photos', {
+      method: 'POST',
+      headers: { 'Prefer': 'return=minimal' },
+      body: paths.map(function (path) {
+        return {
+          first_name: first,
+          last_name: last,
+          storage_path: path,
+          caption: caption || null
+        };
+      })
+    }, 30000);
+  }
+
+  function renderPreviews() {
+    var box = $('photo-previews');
+    var drop = $('drop');
+    if (!box) return;
+
+    previewUrls.forEach(function (u) { URL.revokeObjectURL(u); });
+    previewUrls = [];
+    box.textContent = '';
+
+    selectedPhotos.forEach(function (file, idx) {
+      var url = URL.createObjectURL(file);
+      previewUrls.push(url);
+
+      var item = document.createElement('div');
+      item.className = 'preview';
+
+      var img = document.createElement('img');
+      img.src = url;
+      img.alt = '';
+      item.appendChild(img);
+
+      var remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'preview__remove';
+      remove.setAttribute('aria-label', 'Remove this photo');
+      remove.textContent = '×';
+      remove.addEventListener('click', function () {
+        selectedPhotos.splice(idx, 1);
+        renderPreviews();
+      });
+      item.appendChild(remove);
+
+      box.appendChild(item);
+    });
+
+    if (drop) drop.classList.toggle('has-files', selectedPhotos.length > 0);
+    var title = drop && drop.querySelector('.drop__title');
+    if (title) {
+      title.textContent = selectedPhotos.length
+        ? selectedPhotos.length + ' photo' + (selectedPhotos.length > 1 ? 's' : '') +
+          ' ready' + (selectedPhotos.length < MAX_PHOTOS ? ' — tap to add another' : '')
+        : 'Tap to add photos';
+    }
+  }
+
+  function initPhotoPicker() {
+    var input = $('photos');
+    if (!input) return;
+
+    input.addEventListener('change', function () {
+      setError('photos', '');
+      var incoming = Array.prototype.slice.call(input.files || []);
+
+      var rejected = 0;
+      incoming.forEach(function (f) {
+        if (selectedPhotos.length >= MAX_PHOTOS) { rejected++; return; }
+        if (!/^image\//.test(f.type)) { rejected++; return; }
+        selectedPhotos.push(f);
+      });
+
+      if (rejected) {
+        setError('photos', selectedPhotos.length >= MAX_PHOTOS
+          ? 'Three photos is the limit for one go — you can always come back and add more.'
+          : 'Some of those weren\'t images, so they were skipped.');
+      }
+
+      input.value = '';   // so picking the same file again still fires change
+      renderPreviews();
+      track('form_start', true);
+    });
+  }
+
+  function processAndUploadPhotos() {
+    if (!selectedPhotos.length) return Promise.resolve([]);
+
+    var total = selectedPhotos.length;
+    var done = 0;
+    setStatus('Preparing ' + total + ' photo' + (total > 1 ? 's' : '') + '...', '');
+
+    return selectedPhotos.reduce(function (chain, file) {
+      return chain.then(function (paths) {
+        return downscale(file)
+          .then(uploadPhoto)
+          .then(function (path) {
+            done++;
+            setStatus('Uploaded ' + done + ' of ' + total + '...', '');
+            return paths.concat([path]);
+          })
+          .catch(function () {
+            done++;
+            return paths;   // skip the bad one, keep the rest
+          });
+      });
+    }, Promise.resolve([]));
   }
 
   /* ════════════════════════════ FORM ════════════════════════════ */
@@ -299,10 +583,22 @@
     if (label) label.textContent = on ? 'Signing you up...' : 'Count me in';
   }
 
-  function showSuccess(firstName) {
+  function showSuccess(firstName, photoCount) {
     var success = $('success');
     var title = $('success-title');
     if (title && firstName) title.textContent = "You're in, " + firstName + '.';
+
+    var note = $('success-photos');
+    if (note) {
+      if (photoCount) {
+        note.textContent = photoCount > 1
+          ? 'Your ' + photoCount + ' photos are in the queue — they go up on the wall once I\u2019ve had a look.'
+          : 'Your photo is in the queue — it goes up on the wall once I\u2019ve had a look.';
+        note.hidden = false;
+      } else {
+        note.hidden = true;
+      }
+    }
     if (form) form.hidden = true;
     if (success) {
       success.hidden = false;
@@ -340,19 +636,52 @@
     setStatus('', '');
     track('form_submit');
 
-    requestWithRetry('/signups', {
-      method: 'POST',
-      headers: { 'Prefer': 'return=minimal' },
-      body: data
-    })
+    var uploadedPaths = [];
+
+    /* Photos go up first. If the signup then turns out to be a duplicate we
+       still want the photos, and an orphaned object in a private bucket with
+       no row pointing at it is unreadable by anyone - so nothing leaks. */
+    processAndUploadPhotos()
+      .then(function (paths) {
+        uploadedPaths = paths;
+        if (paths.length) track('photo_upload');
+        setStatus(paths.length ? 'Saving...' : '', '');
+
+        return requestWithRetry('/signups', {
+          method: 'POST',
+          headers: { 'Prefer': 'return=minimal' },
+          body: data
+        });
+      })
       .then(function (res) {
-        if (res.status === 201) { track('form_success'); showSuccess(data.first_name); return; }
+        if (res.status === 201) {
+          return savePhotoRows(uploadedPaths, data.first_name, data.last_name, data.memory)
+            .catch(function () { /* signup already succeeded; don't fail them for this */ })
+            .then(function () {
+              track('form_success');
+              showSuccess(data.first_name, uploadedPaths.length);
+            });
+        }
 
         return res.json().then(function (body) { return body; }, function () { return {}; })
           .then(function (body) {
             if (res.status === 409 || body.code === '23505') {
-              // Already registered. Not an error worth alarming anyone about.
+              /* Already on the list. The photos are still wanted - this is the
+                 only route for anyone who signed up before photos existed. */
               track('form_duplicate');
+              if (uploadedPaths.length) {
+                return savePhotoRows(uploadedPaths, data.first_name, data.last_name, data.memory)
+                  .then(function () {
+                    setStatus("You were already on the list — your photo" +
+                      (uploadedPaths.length > 1 ? 's are' : ' is') +
+                      " added and waiting to go up on the wall.", 'ok');
+                    selectedPhotos = [];
+                    renderPreviews();
+                  })
+                  .catch(function () {
+                    setStatus("You're already on the list, but the photos didn't save. Try once more?", 'error');
+                  });
+              }
               setStatus("You're already on the list — nothing more to do. See you there.", 'ok');
               return;
             }
@@ -434,10 +763,11 @@
       });
     }
 
+    initPhotoPicker();
     initShare();
     track('page_view');
     loadCount();
-    loadMemories();
+    loadWall();
   }
 
   if (document.readyState === 'loading') {

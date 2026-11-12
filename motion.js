@@ -30,7 +30,19 @@
 
   /* ════════════════════════ Public API for app.js ════════════════════════
      One-way only: app.js may ask for a count-up. Nothing flows back. */
+  var corridorScene = null;
+  var pendingCorridorPhotos = null;
+
   window.__trinityMotion = {
+    /* app.js hands the approved photos over once the wall feed resolves. The
+       scene may not exist yet (it is lazy-loaded, and may never load at all on
+       a weak device), so hold them until it does. */
+    setCorridorPhotos: function (urls) {
+      if (!urls || !urls.length) return;
+      pendingCorridorPhotos = urls;
+      if (corridorScene && corridorScene.setPhotos) corridorScene.setPhotos(urls);
+    },
+
     countUp: function (el, target) {
       if (!el || reduced) return false;
       var obj = { v: 0 };
@@ -261,7 +273,10 @@
           .then(function (instance) {
             if (!instance) { showCorridorFallback(); return; }
             scene = instance;
+            corridorScene = instance;
             canvas.classList.add('is-live');
+
+            if (pendingCorridorPhotos) instance.setPhotos(pendingCorridorPhotos);
 
             ScrollTrigger.create({
               trigger: section,
