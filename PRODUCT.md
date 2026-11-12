@@ -115,11 +115,11 @@ hit and a venue is contractually confirmed.
 ## Brand Commitments
 
 - **The organiser's own writing is binding.** Roughly 257 words of first-person
-  copy across the landing page are his, and are preserved verbatim. One
-  heading was changed by him on 9 November 2026; everything else is untouched
+  copy across the landing page are his, and are preserved verbatim. The main heading was
+  set by him on 12 November 2026; everything else is untouched
   and should stay that way. Future work must not rewrite, tighten or
   "improve" this copy without being asked.
-- **Name:** "Trinity Class of 2018 Reunion".
+- **Name:** "Trinity Reunion 2018".
 - **School name:** "Trinity School Bexley" is current and unchanged, confirmed
   12 November 2026.
 - **Voice:** first person, direct, warm, a bit blunt. Written by someone in the

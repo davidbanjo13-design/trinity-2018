@@ -23,8 +23,7 @@
     sub: "A corridor, a classroom, somebody's camera roll from 2018. Add yours and it goes up here with the rest.",
     cta: 'Add your photos',
     ctaHref: '#register',
-    note: 'Free, and it takes about a minute.',
-    cue: 'Scroll'
+    note: 'Free, and it takes about a minute.'
   };
 
   /* Eight resting places around the edge, leaving the middle clear for the
@@ -62,7 +61,7 @@
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var finePointer = window.matchMedia('(pointer: fine)').matches;
 
-  var section, track, stage, cardsBox, cue;
+  var section, track, stage, cardsBox;
   var cards = [];
   var pendingUrls = null;
   var rafId = null;
@@ -167,7 +166,6 @@
     stage.classList.toggle('copy-in', copyIn > 0.15);
 
     // Scroll cue goes almost immediately
-    stage.style.setProperty('--cue', (1 - clamp01(cur / 0.12)).toFixed(4));
 
     applyDrift();
   }
@@ -180,7 +178,6 @@
       // Everything at rest, nothing animating, no dead scroll to wade through
       stage.style.setProperty('--p', '1');
       stage.style.setProperty('--copy', '1');
-      stage.style.setProperty('--cue', '0');
       stage.classList.add('copy-in');
       section.classList.add('is-static');
       return;
@@ -226,7 +223,6 @@
     track    = document.getElementById('scatter-track');
     stage    = document.getElementById('scatter-stage');
     cardsBox = document.getElementById('scatter-cards');
-    cue      = document.getElementById('scatter-cue');
 
     if (!section || !track || !stage || !cardsBox) return;
 
@@ -238,7 +234,6 @@
     set('scatter-heading', COPY.heading);
     set('scatter-sub', COPY.sub);
     set('scatter-note', COPY.note);
-    if (cue) cue.textContent = COPY.cue;
 
     var cta = document.getElementById('scatter-cta');
     if (cta) {

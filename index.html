@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Trinity Class of 2018 Reunion</title>
+<title>Trinity Reunion 2018</title>
 <meta name="description" content="It's been eight years. A reunion for Trinity School Bexley, Year 11, Class of 2018. Sign up free and you'll be first to hear when the date is locked." />
 <meta name="theme-color" content="#000000" />
 
@@ -18,7 +18,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://trinity-2018.netlify.app/" />
 <meta property="og:site_name" content="Trinity 2018 Reunion" />
-<meta property="og:title" content="Trinity Class of 2018 Reunion" />
+<meta property="og:title" content="Trinity Reunion 2018" />
 <meta property="og:description" content="It's been eight years... I think it's time. Sign up free — you'll be the first to hear when the date's locked." />
 <!-- Absolute URL required: preview scrapers do not resolve relative paths.
      Regenerate from og-card.html - instructions are in that file. -->
@@ -26,9 +26,9 @@
 <meta property="og:image:type" content="image/jpeg" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="Trinity Class of 2018 Reunion. It's been eight years... I think it's time." />
+<meta property="og:image:alt" content="Trinity Reunion 2018. It's been eight years... I think it's time." />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Trinity Class of 2018 Reunion" />
+<meta name="twitter:title" content="Trinity Reunion 2018" />
 <meta name="twitter:description" content="It's been eight years... I think it's time." />
 <meta name="twitter:image" content="https://trinity-2018.netlify.app/og.jpg" />
 
@@ -84,24 +84,21 @@
 
   <!-- ─────────────────────────── HERO ─────────────────────────── -->
   <section class="hero" id="hero">
-    <div class="hero__bg" aria-hidden="true">
-      <picture class="hero__media" id="hero-media">
+    <div class="hero__inner">
+
+      <figure class="hero__media" id="hero-media">
         <img class="hero__img"
              src="hero-800.jpg"
              srcset="hero-560.jpg 560w, hero-800.jpg 800w, hero-1184.jpg 1184w"
-             sizes="(min-width: 64rem) 62vw, 100vw"
-             alt="" decoding="async" fetchpriority="high" />
-      </picture>
-      <span class="hero__scrim"></span>
-    </div>
+             sizes="(min-width: 48rem) 22rem, 68vw"
+             width="1184" height="1482"
+             alt="A man in a suit stands in a school corridor, facing a mirror that reflects four pupils in uniform."
+             decoding="async" fetchpriority="high" />
+      </figure>
 
-    <div class="hero__inner">
-      <h1 class="hero__title">
-        <span class="line" data-reveal>Trinity Class of 2018</span>
-        <span class="line accent" data-reveal>Reunion</span>
-      </h1>
+      <h1 class="hero__title" data-reveal>Trinity Reunion 2018</h1>
 
-      <p class="hero__sub" data-reveal><strong>It's been eight years... I think it's time</strong></p>
+      <p class="hero__sub" data-reveal>It's been eight years... I think it's time</p>
 
       <div class="hero__actions" data-reveal>
         <a class="btn btn--primary" href="#register" data-magnetic>
@@ -109,9 +106,8 @@
         </a>
         <p class="hero__note">No date yet. Sign up and you'll be the first to hear.</p>
       </div>
-    </div>
 
-    <div class="scrollcue" aria-hidden="true"><span></span></div>
+    </div>
   </section>
 
   <!-- ─────────────────────────── STORY ─────────────────────────── -->
@@ -139,7 +135,6 @@
        looks dead and costs more than it gains. -->
   <section class="wall" id="wall" hidden>
     <div class="wall__inner">
-      <p class="wall__kicker" data-reveal>The memories wall</p>
       <h2 class="wall__title" data-reveal>What we actually remember</h2>
     </div>
 
@@ -160,7 +155,6 @@
             <p class="scatter__note" id="scatter-note"></p>
           </div>
 
-          <div class="scatter__cue" id="scatter-cue" aria-hidden="true"></div>
 
         </div>
       </div>
@@ -175,11 +169,11 @@
   <!-- ─────────────────────────── COUNTER ─────────────────────────── -->
   <section class="counter" id="counter">
     <div class="counter__inner">
-      <p class="counter__label" data-reveal>Signed up so far</p>
-
       <p class="counter__number" id="counter-number" data-count="0" aria-live="polite">
         <span id="counter-value">—</span>
       </p>
+
+      <p class="counter__label" data-reveal>signed up so far</p>
 
       <!-- Appears once SIGNUP_TARGET is set in app.js (after venue break-even is known) -->
       <div class="counter__progress" id="counter-progress" hidden>

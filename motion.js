@@ -162,26 +162,13 @@
   }
 
   function initHero() {
-    var tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-    tl.to('.hero .eyebrow', { opacity: 1, y: 0, duration: 0.8 })
-      .to('.hero__title .line', { opacity: 1, y: 0, duration: 1.1, stagger: 0.09 }, '-=0.45')
-      .to('.hero__sub', { opacity: 1, y: 0, duration: 0.9 }, '-=0.6')
-      .to('.hero__actions', { opacity: 1, y: 0, duration: 0.9 }, '-=0.65');
-
-    if (reduced) return;
-
-    // Depth: the photo drifts slower than the page as you scroll away from it
-    gsap.to('.hero__media', {
-      yPercent: 12,
-      ease: 'none',
-      scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
-    });
-    gsap.to('.hero__inner', {
-      yPercent: 11,
-      opacity: 0.25,
-      ease: 'none',
-      scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
-    });
+    /* The photograph has its own authored moment - it resolves out of blur as
+       it decodes. The words follow it in; nothing else in the hero animates,
+       and there is no scroll parallax. One moment, not a pile of effects. */
+    gsap.timeline({ defaults: { ease: 'power3.out' } })
+      .to('.hero__title',   { opacity: 1, y: 0, duration: 1.0 })
+      .to('.hero__sub',     { opacity: 1, y: 0, duration: 0.9 }, '-=0.62')
+      .to('.hero__actions', { opacity: 1, y: 0, duration: 0.9 }, '-=0.66');
   }
 
   function initMagnetic() {

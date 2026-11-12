@@ -25,14 +25,16 @@
   --muted:   #a1a1a6;
   --faint:   #86868b;   /* lifted from #646B78, which failed AA for body text */
 
-  /* Gold stays the single accent, used the way Apple uses its blue: every
-     interactive element, nothing else. Apple's own #0066cc is their brand
-     mark, not a token to borrow. */
-  --gold:      #E9B949;
-  --gold-soft: #F3D389;
-  --gold-dim:  rgba(233, 185, 73, 0.16);
-  --danger:    #ff6b6b;
-  --ok:        #5fd39b;
+  /* No interface colour. White is the interactive value and the photographs
+     supply every bit of colour on the page. The old gold was arbitrary - it
+     referred to nothing about this school, this year, or this photograph -
+     and arbitrary colour is what makes a page look generated.
+     Red and green below are semantic state, not brand. */
+  --action:      #ffffff;
+  --action-soft: #d2d2d7;
+  --action-dim:  rgba(255, 255, 255, 0.14);
+  --danger:      #ff453a;
+  --ok:          #30d158;
 
   /* SF Pro on Apple hardware, Roboto on Android, Segoe on Windows. No webfont
      request at all - faster, and what Apple actually ships. */
@@ -78,14 +80,23 @@ body {
 
 h1, h2, h3 { margin: 0; font-weight: 400; letter-spacing: -0.02em; }
 p { margin: 0; }
-strong { font-weight: 600; color: #fff; }
+strong { font-weight: 600; color: var(--text); }
 em { font-style: italic; }
 canvas { display: block; }
 
-::selection { background: var(--gold); color: #000; }
+/* Surfaces the browser would otherwise style for us. Cheap, and the single
+   clearest signal that a page was built rather than assembled. */
+::selection { background: var(--text); color: #000; }
+html { scrollbar-color: #3a3a3c transparent; scrollbar-width: thin; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #3a3a3c; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #4e4e52; }
+input, textarea { caret-color: var(--text); }
+a { text-underline-offset: 0.18em; text-decoration-thickness: from-font; }
 
 :focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--action);
   outline-offset: 3px;
   border-radius: 4px;
 }
@@ -96,7 +107,7 @@ canvas { display: block; }
   top: 0;
   z-index: 9999;
   padding: 0.75rem 1.25rem;
-  background: var(--gold);
+  background: var(--action);
   color: #000;
   font-weight: 600;
   text-decoration: none;
@@ -152,7 +163,7 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
   text-align: center;
   color: var(--text);
 }
-.loader__mark span { color: var(--gold); margin: 0 0.1em; }
+.loader__mark span { color: var(--action); margin: 0 0.1em; }
 
 .loader__bar {
   width: min(13rem, 48vw);
@@ -164,11 +175,13 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
   display: block;
   height: 100%;
   width: 0;
-  background: var(--gold);
+  background: var(--action);
   transition: width 0.4s linear;
 }
 
-/* ──────────────────────────────── Hero ──────────────────────────────── */
+/* ──────────────────────────────── Hero ────────────────────────────────
+   The photograph leads and the words follow it, rather than sitting on top
+   of it. Nothing is cropped: the source is 4:5 and so is the frame. */
 
 .hero {
   position: relative;
@@ -176,193 +189,79 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
   min-height: 100svh;
   display: grid;
   align-content: center;
-  padding: 5rem var(--page) 6rem;
-  overflow: hidden;
+  justify-items: center;
+  /* Padding scales with viewport HEIGHT, not just width: on a short laptop
+     the photo and the words still have to share one screen. */
+  padding: clamp(2.5rem, 7svh, 4rem) var(--page) clamp(2rem, 6svh, 3.5rem);
+  text-align: center;
 }
 
-.hero__bg { position: absolute; inset: 0; pointer-events: none; }
-
-/* ── Hero photograph ───────────────────────────────────────────────────
-   A portrait source behind a full-bleed hero, so the crop is controlled by
-   object-position rather than left to chance. Both the man and the mirror
-   have to survive it - the picture means nothing with only one of them. */
+.hero__inner {
+  display: grid;
+  justify-items: center;
+  gap: clamp(1rem, 3svh, 1.8rem);
+  max-width: 44rem;
+  width: 100%;
+}
 
 .hero__media {
-  position: absolute;
-  inset: 0;
-  display: block;
+  margin: 0;
+  /* Bounded by height as well as width, so the photo and the words below it
+     still share one viewport on a short laptop screen. */
+  width: min(25rem, 66vw, 34svh);
+  aspect-ratio: 4 / 5;
+  border-radius: var(--r-card);
   overflow: hidden;
+  background: var(--ink-tile);
+  /* The one elevation in the system: imagery resting on a surface. */
+  box-shadow: rgba(0, 0, 0, 0.55) 0 1.5rem 3.5rem -1rem;
 }
 
-.hero__img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 55% 38%;
-}
+.hero__img { display: block; width: 100%; height: 100%; object-fit: cover; }
 
-/* The blur-in is opt-in via .js-on, so with JS off the photo is simply
-   sharp from first paint instead of stranded behind a filter. */
+/* The authored moment: the photograph resolves out of blur as it decodes,
+   like a memory coming into focus. Opt-in via .js-on, so with JS off it is
+   simply sharp. */
 .js-on .hero__img {
   opacity: 0;
-  transform: scale(1.07);
-  filter: blur(26px) saturate(0.5) brightness(0.75);
+  transform: scale(1.06);
+  filter: blur(22px) saturate(0.55);
   transition:
-    opacity 1.2s var(--ease),
-    transform 2.4s var(--ease),
-    filter 2s var(--ease);
+    opacity 1.1s var(--ease),
+    transform 2.2s var(--ease),
+    filter 1.8s var(--ease);
   will-change: opacity, transform, filter;
 }
-
 .js-on .hero__media.is-loaded .hero__img {
   opacity: 1;
   transform: scale(1);
-  filter: blur(0px) saturate(1) brightness(1);
-}
-
-/* A slow drift so the hero is never completely still */
-@media (prefers-reduced-motion: no-preference) {
-  .js-on .hero__media.is-loaded .hero__img {
-    animation: heroDrift 30s ease-in-out 2.6s infinite alternate;
-  }
-}
-@keyframes heroDrift {
-  from { transform: scale(1)     translate3d(0, 0, 0); }
-  to   { transform: scale(1.055) translate3d(-1.4%, -1.6%, 0); }
-}
-
-/* Legibility, not decoration. Without this the white and gold type dies on
-   the bright window and the yellow corridor wall. */
-.hero__scrim {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(to bottom,
-      rgba(0, 0, 0, 0.94) 0%,
-      rgba(0, 0, 0, 0.58) 30%,
-      rgba(0, 0, 0, 0.74) 62%,
-      rgba(0, 0, 0, 0.97) 100%),
-    radial-gradient(125% 85% at 68% 42%,
-      rgba(0, 0, 0, 0) 30%,
-      rgba(0, 0, 0, 0.9) 100%);
-}
-
-@media (min-width: 64rem) {
-  /* On a wide screen the photo moves to the right and dissolves into the
-     page, leaving the headline a clean dark field to sit on. */
-  .hero__media {
-    left: auto;
-    right: 0;
-    width: 62%;
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 36%);
-            mask-image: linear-gradient(to right, transparent 0%, #000 36%);
-  }
-  .hero__img { object-position: 52% 30%; }
-  .hero__scrim {
-    background:
-      linear-gradient(to right,
-        rgba(0, 0, 0, 0.97) 0%,
-        rgba(0, 0, 0, 0.90) 30%,
-        rgba(0, 0, 0, 0.45) 58%,
-        rgba(0, 0, 0, 0.30) 100%),
-      linear-gradient(to bottom,
-        rgba(0, 0, 0, 0.55) 0%,
-        rgba(0, 0, 0, 0) 28%,
-        rgba(0, 0, 0, 0) 62%,
-        rgba(0, 0, 0, 0.92) 100%);
-  }
-}
-
-
-
-.hero__inner {
-  position: relative;
-  width: 100%;
-  max-width: var(--max);
-  margin: 0 auto;
-}
-
-.eyebrow {
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 1.75rem;
+  filter: blur(0px) saturate(1);
 }
 
 .hero__title {
   font-family: var(--display);
-  /* min trimmed a little: the title line is longer than the old one, and
-     this stops it breaking into three lines on a narrow phone */
   font-weight: 600;
-  font-size: clamp(2.6rem, 8.2vw, 5.6rem);
-  line-height: 1.05;
-  /* The "Apple tight" headline. Negative tracking at display sizes is the
-     single most recognisable thing about their typography. */
-  letter-spacing: -0.015em;
-}
-.hero__title .line {
-  display: block;
-  /* If "Trinity Class of 2018" has to wrap on a narrow phone, split it evenly
-     rather than orphaning "2018" on a line of its own */
+  font-size: clamp(2.3rem, 6.4vw, 4rem);
+  line-height: 1.04;
+  letter-spacing: -0.018em;
   text-wrap: balance;
+  color: var(--text);
 }
-/* Gold, but not italic. A display serif in italic is the least Apple thing
-   there is; the colour carries it on its own. */
-.hero__title .accent { color: var(--gold); }
 
 .hero__sub {
-  margin-top: 1.4rem;
-  max-width: 34rem;
-  /* Apple's "lead": large, regular weight, tight leading. Not bold - the size
-     does the work. */
-  font-size: clamp(1.2rem, 3.1vw, 1.75rem);
+  max-width: 28rem;
+  font-size: clamp(1.15rem, 2.9vw, 1.5rem);
   font-weight: 400;
-  line-height: 1.16;
-  letter-spacing: 0.004em;
+  line-height: 1.22;
   color: var(--muted);
 }
-.hero__sub strong { color: var(--text); font-weight: 400; }
 
 .hero__actions {
-  margin-top: 2.25rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1rem;
+  display: grid;
+  justify-items: center;
+  gap: 0.9rem;
 }
-/* Was --faint, which was fine on flat black but too dim once a photograph
-   sits behind it. */
-.hero__note { font-size: 0.875rem; color: var(--muted); }
-
-/* Insurance for type over a photo: the crop shifts with viewport, so a bright
-   patch can land under the text on some screens and not others. Costs nothing
-   on the dark areas and saves legibility on the light ones. */
-/* No text-shadow: Apple puts none on headlines. The scrim gradient does the
-   legibility work instead, which is how they do it too. */
-
-.scrollcue {
-  position: absolute;
-  left: 50%;
-  bottom: 2rem;
-  transform: translateX(-50%);
-  width: 1px;
-  height: 3.5rem;
-  background: var(--line-strong);
-  overflow: hidden;
-}
-.scrollcue span {
-  position: absolute;
-  inset: 0;
-  background: var(--gold);
-  animation: cue 2.4s var(--ease) infinite;
-}
-@keyframes cue {
-  0%   { transform: translateY(-100%); }
-  60%, 100% { transform: translateY(100%); }
-}
+.hero__note { font-size: 0.875rem; color: var(--faint); }
 
 /* ──────────────────────────────── Buttons ──────────────────────────────── */
 
@@ -386,16 +285,16 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
   transition: transform 0.4s var(--ease), background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 .btn--primary {
-  background: var(--gold);
+  background: var(--action);
   color: #000;
 }
-.btn--primary:hover { background: var(--gold-soft); }
+.btn--primary:hover { background: var(--action-soft); }
 .btn--ghost {
   background: transparent;
   border-color: var(--line-strong);
   color: var(--text);
 }
-.btn--ghost:hover { border-color: var(--gold); color: var(--gold); }
+.btn--ghost:hover { border-color: var(--action); color: var(--action); }
 .btn--full { width: 100%; }
 .btn:disabled { opacity: 0.65; cursor: not-allowed; }
 .btn:active { transform: scale(0.985); }
@@ -404,7 +303,7 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
 .btn.is-loading .btn__spinner {
   display: block;
   border: 2px solid rgba(0, 0, 0, 0.25);
-  border-top-color: #0A0A0A;
+  border-top-color: #000;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -453,14 +352,6 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
 }
 .wall__inner { max-width: var(--max); margin: 0 auto; }
 
-.wall__kicker {
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
-  color: var(--gold);
-  text-align: center;
-}
 .wall__title {
   margin-top: 1rem;
   font-family: var(--display);
@@ -468,7 +359,7 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
   font-size: clamp(1.9rem, 4.8vw, 2.75rem);
   letter-spacing: -0.012em;
   line-height: 1.1;
-  color: #fff;
+  color: var(--text);
   text-align: center;
 }
 
@@ -504,8 +395,8 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
   white-space: pre-wrap;      /* keep the line breaks people actually typed */
   overflow-wrap: anywhere;    /* someone will paste a 400-character word */
 }
-.memory__text::before { content: '\201C'; color: var(--gold); }
-.memory__text::after  { content: '\201D'; color: var(--gold); }
+.memory__text::before { content: '\201C'; color: var(--action); }
+.memory__text::after  { content: '\201D'; color: var(--action); }
 
 .memory__name {
   margin-top: 1.1rem;
@@ -514,7 +405,7 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--action);
 }
 
 .wall__foot {
@@ -552,7 +443,6 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
   place-items: center;
   --p: 0;
   --copy: 0;
-  --cue: 1;
 }
 
 .scatter__cards { position: absolute; inset: 0; pointer-events: none; }
@@ -606,7 +496,7 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--action);
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
@@ -632,7 +522,7 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
   font-size: clamp(1.9rem, 4.8vw, 2.75rem);
   letter-spacing: -0.012em;
   line-height: 1.08;
-  color: #fff;
+  color: var(--text);
   text-shadow: 0 2px 30px rgba(0, 0, 0, 0.8);
 }
 .scatter__sub {
@@ -645,18 +535,6 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
 .scatter__cta { margin-top: 2rem; }
 .scatter__note { margin-top: 1rem; font-size: 0.85rem; color: var(--faint); }
 
-.scatter__cue {
-  position: absolute;
-  left: 50%;
-  bottom: 2rem;
-  transform: translateX(-50%);
-  opacity: var(--cue);
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--faint);
-}
 
 @media (max-width: 749px), (pointer: coarse) {
   /* Two bands, top and bottom. Nothing lands on the copy. */
@@ -694,7 +572,6 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
   transform: none;
   width: clamp(6.5rem, 20vw, 9.5rem);
 }
-.scatter.is-static .scatter__cue { display: none; }
 
 /* ─────────────────────────────── Counter ─────────────────────────────── */
 
@@ -707,11 +584,11 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
 .counter__inner { max-width: var(--max-narrow); margin: 0 auto; text-align: center; }
 
 .counter__label {
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
-  color: var(--faint);
+  margin-top: 0.4rem;
+  font-size: 1.0625rem;
+  color: var(--muted);
+  letter-spacing: 0;
+  text-transform: none;
 }
 .counter__number {
   font-family: var(--display);
@@ -719,9 +596,9 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
   font-size: clamp(4.5rem, 20vw, 11rem);
   line-height: 1;
   letter-spacing: -0.03em;
-  color: var(--gold);
+  color: var(--action);
   font-variant-numeric: tabular-nums;
-  margin: 0.5rem 0 0.75rem;
+  margin: 0;
 }
 .counter__progress { margin: 1.5rem auto 0; max-width: 26rem; }
 .counter__track {
@@ -733,7 +610,7 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
 .counter__fill {
   height: 100%;
   width: 0;
-  background: linear-gradient(90deg, var(--gold), var(--gold-soft));
+  background: linear-gradient(90deg, var(--action), var(--action-soft));
   border-radius: 999px;
   transition: width 1.4s var(--ease);
 }
@@ -750,7 +627,7 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
   font-weight: 600;
   font-size: clamp(1.9rem, 4.8vw, 2.75rem);
   letter-spacing: -0.012em;
-  color: #fff;
+  color: var(--text);
   margin-bottom: 1.1rem;
 }
 .register__intro {
@@ -792,13 +669,14 @@ input[type='text'], input[type='email'], textarea {
   line-height: 1.5;
   transition: border-color 0.25s, background-color 0.25s, box-shadow 0.25s;
 }
-input::placeholder, textarea::placeholder { color: #4E5563; }
+/* Placeholders are body text and must clear AA like any other. */
+input::placeholder, textarea::placeholder { color: var(--faint); }
 input:hover, textarea:hover { border-color: var(--line-strong); }
 input:focus, textarea:focus {
   outline: none;
-  border-color: var(--gold);
-  background: #131722;
-  box-shadow: 0 0 0 3px var(--gold-dim);
+  border-color: var(--action);
+  background: #2a2a2c;
+  box-shadow: 0 0 0 3px var(--action-dim);
 }
 textarea { resize: vertical; min-height: 6rem; }
 
@@ -824,8 +702,8 @@ textarea { resize: vertical; min-height: 6rem; }
   cursor: pointer;
   transition: border-color 0.25s, background-color 0.25s;
 }
-.drop:hover { border-color: var(--gold); background: #131722; }
-.drop:focus-within { outline: 2px solid var(--gold); outline-offset: 3px; }
+.drop:hover { border-color: var(--action); background: #2a2a2c; }
+.drop:focus-within { outline: 2px solid var(--action); outline-offset: 3px; }
 .drop.has-files { border-style: solid; border-color: rgba(233, 185, 73, 0.45); }
 
 .drop input[type="file"] {
@@ -837,7 +715,7 @@ textarea { resize: vertical; min-height: 6rem; }
 }
 
 .drop__icon { display: block; line-height: 0; }
-.drop__icon svg { width: 1.8rem; height: 1.8rem; color: var(--gold); }
+.drop__icon svg { width: 1.8rem; height: 1.8rem; color: var(--action); }
 .drop__title { font-size: 0.95rem; font-weight: 600; color: var(--text); }
 .drop__hint  { font-size: 0.8rem; color: var(--faint); }
 
@@ -866,7 +744,7 @@ textarea { resize: vertical; min-height: 6rem; }
   border: 0;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.82);
-  color: #fff;
+  color: var(--text);
   font-size: 1.05rem;
   line-height: 1;
   cursor: pointer;
@@ -909,18 +787,18 @@ textarea { resize: vertical; min-height: 6rem; }
   top: 0.17rem;
   width: 0.32rem;
   height: 0.6rem;
-  border: solid #0A0A0A;
+  border: solid #000;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg) scale(0);
   transition: transform 0.2s var(--ease);
 }
 .check input:checked + .check__box {
-  background: var(--gold);
-  border-color: var(--gold);
+  background: var(--action);
+  border-color: var(--action);
 }
 .check input:checked + .check__box::after { transform: rotate(45deg) scale(1); }
 .check input:focus-visible + .check__box {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--action);
   outline-offset: 3px;
 }
 
@@ -951,7 +829,7 @@ textarea { resize: vertical; min-height: 6rem; }
   height: 3.75rem;
   margin: 0 auto 1.5rem;
   border-radius: 50%;
-  background: var(--gold-dim);
+  background: var(--action-dim);
   display: grid;
   place-items: center;
 }
@@ -959,7 +837,7 @@ textarea { resize: vertical; min-height: 6rem; }
   width: 2rem;
   height: 2rem;
   fill: none;
-  stroke: var(--gold);
+  stroke: var(--action);
   stroke-width: 4;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -976,13 +854,13 @@ textarea { resize: vertical; min-height: 6rem; }
   font-weight: 600;
   font-size: clamp(1.7rem, 4.4vw, 2.25rem);
   letter-spacing: -0.012em;
-  color: #fff;
+  color: var(--text);
   margin-bottom: 0.75rem;
 }
 .success__body { color: var(--muted); max-width: 26rem; margin: 0 auto; }
 .success__photos {
   margin-top: 0.85rem;
-  color: var(--gold);
+  color: var(--action);
   font-size: 0.92rem;
 }
 
@@ -1011,7 +889,7 @@ textarea { resize: vertical; min-height: 6rem; }
   display: grid;
   gap: 0.5rem;
 }
-.footer__small { color: #4A5160; font-size: 0.8rem; }
+.footer__small { color: var(--faint); font-size: 0.8rem; }
 
 /* Was falling through to the browser default — bright blue on a dark page */
 .footer__link {
@@ -1021,7 +899,7 @@ textarea { resize: vertical; min-height: 6rem; }
   text-decoration-color: rgba(255, 255, 255, 0.2);
   transition: color 0.25s, text-decoration-color 0.25s;
 }
-.footer__link:hover { color: var(--gold); text-decoration-color: var(--gold); }
+.footer__link:hover { color: var(--action); text-decoration-color: var(--action); }
 
 /* ──────────────────────────── Accessibility ──────────────────────────── */
 
