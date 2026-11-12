@@ -1,6 +1,9 @@
 # PRODUCT.md and DESIGN.md have to sit at the repo root for the tooling to
-# find them, but this repo is also the deployed site. They hold strategy and
-# internal state, not secrets - still nobody's business at a public URL.
-/PRODUCT.md    /404.html  404
-/DESIGN.md     /404.html  404
-/og-card.html  /404.html  404
+# resolve them, but this repo is also the deployed site. They hold strategy
+# and internal state, not secrets - still nobody's business at a public URL.
+#
+# The trailing ! is required. Without it Netlify serves the real file and
+# ignores the rule, because redirects only apply when no file matches.
+/PRODUCT.md    /404.html  404!
+/DESIGN.md     /404.html  404!
+/og-card.html  /404.html  404!
