@@ -16,9 +16,6 @@
   Must stay exactly 1200x630 - that is the aspect ratio WhatsApp and
   iMessage crop to. Keep text well inside the edges; some clients crop.
 -->
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;600&display=swap" />
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -26,9 +23,9 @@
 
   body {
     position: relative;
-    background: #07080B;
+    background: #000000;
     color: #F3F4F6;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -40,7 +37,7 @@
     right: -40px;
     top: 50%;
     transform: translateY(-50%);
-    font-family: 'Instrument Serif', Georgia, serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
     font-size: 440px;
     line-height: 0.8;
     color: rgba(255, 255, 255, 0.028);
@@ -75,13 +72,14 @@
   }
 
   h1 {
-    font-family: 'Instrument Serif', Georgia, serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
     font-weight: 400;
-    font-size: 86px;
-    line-height: 0.99;
-    letter-spacing: -0.02em;
+    font-size: 80px;
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.015em;
   }
-  h1 .gold { color: #E9B949; font-style: italic; }
+  h1 .gold { color: #E9B949; }
 
   .sub {
     margin-top: 34px;
