@@ -573,28 +573,6 @@ html:not(.motion-on) .corridor__stage {
 .memory__text::before { content: '\201C'; color: var(--gold); }
 .memory__text::after  { content: '\201D'; color: var(--gold); }
 
-/* Photo cards sit in the same masonry column flow as the text ones */
-.memory--photo { padding: 0.5rem 0.5rem 1rem; }
-
-.memory__frame {
-  border-radius: 10px;
-  overflow: hidden;
-  background: #0A0C11;
-  line-height: 0;
-}
-.memory__img { display: block; width: 100%; height: auto; }
-
-.memory__caption {
-  margin: 1rem 0.75rem 0;
-  font-family: var(--display);
-  font-size: clamp(1rem, 3vw, 1.15rem);
-  line-height: 1.45;
-  color: var(--text);
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-.memory--photo .memory__name { margin: 0.7rem 0.75rem 0; }
-
 .memory__name {
   margin-top: 1.1rem;
   font-family: var(--sans);
@@ -611,6 +589,173 @@ html:not(.motion-on) .corridor__stage {
   color: var(--faint);
   font-size: 0.95rem;
 }
+
+/* ────────────────────── Scroll-scatter photo stage ──────────────────────
+   Cards interpolate from a centre pile (--sx/--sy/--sr) out to perimeter
+   positions entirely in calc(), driven by one --p that scatter.js updates.
+
+   The phone layout works by swapping which variable feeds the transform
+   (--ux/--uy/--ur), not by overriding the inline values - a media query
+   cannot beat an inline style, but it can point at a different variable. */
+
+.scatter {
+  /* clip, NOT hidden: hidden would make this a scroll container and the
+     sticky stage inside would stop sticking */
+  overflow-x: clip;
+}
+
+.scatter__track {
+  position: relative;
+  height: 350svh;
+}
+
+.scatter__stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: grid;
+  place-items: center;
+  --p: 0;
+  --copy: 0;
+  --cue: 1;
+}
+
+.scatter__cards { position: absolute; inset: 0; pointer-events: none; }
+
+.scatter__card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  /* bounded by height as well as width: positions are in svh but the
+     card was sized only in rem/vw, so short viewports overflowed */
+  width: clamp(5.5rem, min(14vw, 19svh), 12.5rem);
+  margin: 0;
+  padding: 0.4rem;
+  background: var(--ink-raised);
+  border: 1px solid rgba(233, 185, 73, 0.28);
+  border-radius: 4px;
+  box-shadow: 0 1.5rem 3.5rem -1rem rgba(0, 0, 0, 0.8);
+
+  --px: 0px;
+  --py: 0px;
+  --ux: var(--dx);
+  --uy: var(--dy);
+  --ur: var(--dr);
+
+  transform:
+    translate(-50%, -50%)
+    translate(
+      calc(var(--sx) + (var(--ux) - var(--sx)) * var(--p) + var(--px)),
+      calc(var(--sy) + (var(--uy) - var(--sy)) * var(--p) + var(--py))
+    )
+    rotate(calc(var(--sr) + (var(--ur) - var(--sr)) * var(--p)))
+    scale(calc(1 + (var(--dsc) - 1) * var(--p)));
+
+  will-change: transform;
+}
+
+.scatter__card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 2px;
+}
+
+.scatter__card-name {
+  margin-top: 0.45rem;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.scatter__card-name:empty { display: none; }
+
+.scatter__center {
+  position: relative;
+  z-index: 50;
+  max-width: 26rem;   /* narrower so the cards have room to clear it */
+  padding: 0 var(--page);
+  text-align: center;
+  opacity: var(--copy);
+  transform: scale(calc(0.93 + 0.07 * var(--copy)));
+  pointer-events: none;   /* invisible copy must not swallow clicks */
+}
+.scatter__stage.copy-in .scatter__center { pointer-events: auto; }
+
+.scatter__heading {
+  font-family: var(--display);
+  font-size: clamp(2rem, 7vw, 3.4rem);
+  line-height: 1.06;
+  color: #fff;
+  text-shadow: 0 2px 30px rgba(7, 8, 11, 0.8);
+}
+.scatter__sub {
+  margin-top: 1.1rem;
+  color: var(--muted);
+  font-size: clamp(1rem, 3vw, 1.1rem);
+  line-height: 1.65;
+  text-shadow: 0 2px 24px rgba(7, 8, 11, 0.8);
+}
+.scatter__cta { margin-top: 2rem; }
+.scatter__note { margin-top: 1rem; font-size: 0.85rem; color: var(--faint); }
+
+.scatter__cue {
+  position: absolute;
+  left: 50%;
+  bottom: 2rem;
+  transform: translateX(-50%);
+  opacity: var(--cue);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+@media (max-width: 749px), (pointer: coarse) {
+  /* Two bands, top and bottom. Nothing lands on the copy. */
+  .scatter__card {
+    --ux: var(--mx);
+    --uy: var(--my);
+    --ur: var(--mr);
+    width: clamp(4.75rem, min(25vw, 15svh), 8rem);
+  }
+  .scatter__track { height: 300svh; }
+}
+
+/* Reduced motion: no sticky, no scroll hijack, no dead space - just the
+   photos in a row with the copy underneath. */
+.scatter.is-static .scatter__track { height: auto; }
+.scatter.is-static .scatter__stage {
+  position: relative;
+  height: auto;
+  padding: 1rem 0 3rem;
+  gap: 2.5rem;
+}
+.scatter.is-static .scatter__cards {
+  position: relative;
+  inset: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  justify-content: center;
+  padding: 0 var(--page);
+}
+.scatter.is-static .scatter__card {
+  position: relative;
+  left: auto;
+  top: auto;
+  transform: none;
+  width: clamp(6.5rem, 20vw, 9.5rem);
+}
+.scatter.is-static .scatter__cue { display: none; }
 
 /* ─────────────────────────────── Counter ─────────────────────────────── */
 

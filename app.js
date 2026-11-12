@@ -200,37 +200,6 @@
     });
   }
 
-  function photoCard(row, url) {
-    var card = document.createElement('figure');
-    card.className = 'memory memory--photo';
-
-    var frame = document.createElement('div');
-    frame.className = 'memory__frame';
-
-    var img = document.createElement('img');
-    img.className = 'memory__img';
-    img.src = url;
-    img.alt = row.caption ? String(row.caption) : 'A photo from 2018';
-    img.loading = 'lazy';
-    img.decoding = 'async';
-    frame.appendChild(img);
-    card.appendChild(frame);
-
-    if (row.caption) {
-      var cap = document.createElement('figcaption');
-      cap.className = 'memory__caption';
-      cap.textContent = row.caption;   // textContent: other people wrote this
-      card.appendChild(cap);
-    }
-
-    var name = document.createElement('figcaption');
-    name.className = 'memory__name';
-    name.textContent = row.display_name || '';
-    card.appendChild(name);
-
-    return card;
-  }
-
   function textCard(row) {
     var card = document.createElement('figure');
     card.className = 'memory';
@@ -251,29 +220,24 @@
   function renderWall(memories, photoPairs) {
     var section = $('wall');
     var grid = $('wall-grid');
+    var textBlock = $('wall-text');
     if (!section || !grid) return;
 
-    var hasAny = (photoPairs && photoPairs.length) || (memories && memories.length);
-    if (!hasAny) { section.hidden = true; return; }
+    var photos = photoPairs || [];
+    var texts = (memories || []).filter(function (r) { return r && r.memory; });
 
+    if (!photos.length && !texts.length) { section.hidden = true; return; }
+
+    /* Photos go to the scroll-scatter stage, not into this grid. The grid is
+       now text memories only, and hides itself when there are none rather
+       than leaving "Add yours when you sign up." floating on its own. */
     grid.textContent = '';
-    var i = 0;
-
-    // Photos first - they are the reason anyone scrolls this far
-    (photoPairs || []).forEach(function (pair) {
-      var card = photoCard(pair.row, pair.url);
-      card.style.transitionDelay = Math.min(i++ * 70, 700) + 'ms';
-      grid.appendChild(card);
-    });
-
-    (memories || []).forEach(function (row) {
-      if (!row || !row.memory) return;
+    texts.forEach(function (row, i) {
       var card = textCard(row);
-      card.style.transitionDelay = Math.min(i++ * 70, 700) + 'ms';
+      card.style.transitionDelay = Math.min(i * 70, 700) + 'ms';
       grid.appendChild(card);
     });
-
-    if (!grid.children.length) { section.hidden = true; return; }
+    if (textBlock) textBlock.hidden = texts.length === 0;
 
     section.hidden = false;
     track('wall_view', true);
@@ -304,13 +268,33 @@
       });
 
     return Promise.all([memories, photos]).then(function (out) {
-      renderWall(out[0], out[1]);
+      var pairs = out[1];
+      renderWall(out[0], pairs);
 
-      // Hand the photos to the 3D corridor so its frames stop being empty.
-      // One-way, and entirely optional - motion.js may never have loaded.
+      var urls = pairs.map(function (pair) { return pair.url; });
+
+      /* The privacy notice promises photos appear with a first name and last
+         initial, so the scatter cards get the attribution, not just the image. */
+      var items = pairs.map(function (pair) {
+        return {
+          url: pair.url,
+          name: pair.row.display_name || '',
+          caption: pair.row.caption || ''
+        };
+      });
+
+      // Hand the photos to the two places that display them. Both are
+      // optional and one-way: neither can report a problem back here, and
+      // neither failing affects the signup form.
       try {
-        if (window.__trinityMotion && window.__trinityMotion.setCorridorPhotos) {
-          window.__trinityMotion.setCorridorPhotos(out[1].map(function (p) { return p.url; }));
+        if (items.length && window.__trinityScatter) {
+          window.__trinityScatter.setPhotos(items);
+        }
+      } catch (e) { /* presentation only */ }
+
+      try {
+        if (urls.length && window.__trinityMotion && window.__trinityMotion.setCorridorPhotos) {
+          window.__trinityMotion.setCorridorPhotos(urls);
         }
       } catch (e) { /* decoration only */ }
     });

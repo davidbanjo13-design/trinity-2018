@@ -169,8 +169,34 @@
     <div class="wall__inner">
       <p class="wall__kicker" data-reveal>The memories wall</p>
       <h2 class="wall__title" data-reveal>What we actually remember</h2>
+    </div>
+
+    <!-- Scroll-scatter stage. The photos start as a pile in the middle and
+         scatter to the edges as you scroll, opening a gap for the copy.
+         overflow-x: clip on the wrapper rather than hidden - hidden would
+         create a scroll container and break the sticky stage inside it. -->
+    <div class="scatter" id="scatter" hidden>
+      <div class="scatter__track" id="scatter-track">
+        <div class="scatter__stage" id="scatter-stage">
+
+          <div class="scatter__cards" id="scatter-cards" aria-hidden="true"></div>
+
+          <div class="scatter__center">
+            <h3 class="scatter__heading" id="scatter-heading"></h3>
+            <p class="scatter__sub" id="scatter-sub"></p>
+            <a class="btn btn--primary scatter__cta" id="scatter-cta" href="#register"></a>
+            <p class="scatter__note" id="scatter-note"></p>
+          </div>
+
+          <div class="scatter__cue" id="scatter-cue" aria-hidden="true"></div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="wall__inner" id="wall-text" hidden>
       <div class="wall__grid" id="wall-grid"></div>
-      <p class="wall__foot" data-reveal>Add yours when you sign up.</p>
+      <p class="wall__foot">Add yours when you sign up.</p>
     </div>
   </section>
 
@@ -318,6 +344,10 @@
 
 <!-- Data layer: plain fetch, zero dependencies. Must work even if everything below fails. -->
 <script src="app.js"></script>
+
+<!-- Scatter stage: renders the photos, so it carries no library dependency
+     and loads independently of the motion bundle below. -->
+<script defer src="scatter.js"></script>
 
 <!-- Motion layer: strictly decorative, loaded after and isolated from the form. -->
 <script defer src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
