@@ -271,8 +271,6 @@
       var pairs = out[1];
       renderWall(out[0], pairs);
 
-      var urls = pairs.map(function (pair) { return pair.url; });
-
       /* The privacy notice promises photos appear with a first name and last
          initial, so the scatter cards get the attribution, not just the image. */
       var items = pairs.map(function (pair) {
@@ -283,20 +281,14 @@
         };
       });
 
-      // Hand the photos to the two places that display them. Both are
-      // optional and one-way: neither can report a problem back here, and
-      // neither failing affects the signup form.
+      // Hand the photos to the scatter stage. One-way and optional: it
+      // cannot report a problem back here, and it failing would not affect
+      // the signup form.
       try {
         if (items.length && window.__trinityScatter) {
           window.__trinityScatter.setPhotos(items);
         }
       } catch (e) { /* presentation only */ }
-
-      try {
-        if (urls.length && window.__trinityMotion && window.__trinityMotion.setCorridorPhotos) {
-          window.__trinityMotion.setCorridorPhotos(urls);
-        }
-      } catch (e) { /* decoration only */ }
     });
   }
 

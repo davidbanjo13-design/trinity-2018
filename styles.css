@@ -427,90 +427,6 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
   color: var(--text);
 }
 
-/* ───────────────────────── The 3D memory corridor ───────────────────────── */
-
-.corridor { position: relative; height: 320vh; }
-html:not(.motion-on) .corridor { height: auto; }
-
-.corridor__stage {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  overflow: hidden;
-  display: grid;
-  place-items: center;
-}
-html:not(.motion-on) .corridor__stage {
-  position: relative;
-  min-height: 70svh;
-  height: auto;
-  padding: 5rem 0;
-}
-
-.corridor__canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 1.2s var(--ease);
-}
-.corridor__canvas.is-live { opacity: 1; }
-
-/* CSS fallback — no WebGL, data saver, reduced motion, or weak device */
-.corridor__fallback {
-  position: absolute;
-  inset: 0;
-  display: none;
-  place-items: center;
-}
-.corridor__fallback.is-live { display: grid; }
-.corridor__fallback i {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: clamp(5.5rem, 17vw, 10rem);
-  aspect-ratio: 3 / 4;
-  background: linear-gradient(160deg, rgba(255,255,255,0.07), rgba(255,255,255,0.015));
-  border: 1px solid var(--line);
-  border-radius: 2px;
-  transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) rotate(var(--r));
-  animation: drift 9s ease-in-out infinite alternate;
-  animation-delay: var(--d);
-}
-@keyframes drift {
-  to { transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y) - 1.1rem)) rotate(var(--r)); }
-}
-
-.corridor__copy {
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  padding: 0 var(--page);
-  max-width: 40rem;
-}
-.corridor__kicker {
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 1.5rem;
-}
-.corridor__title {
-  font-family: var(--display);
-  font-size: clamp(2.1rem, 7.5vw, 4rem);
-  line-height: 1.06;
-  color: #fff;
-  text-shadow: 0 0.5rem 3rem rgba(0, 0, 0, 0.75);
-}
-.corridor__title em { color: var(--gold); }
-.corridor__sub {
-  margin-top: 1.5rem;
-  color: var(--muted);
-  font-size: 1rem;
-}
-
 /* ──────────────────────────── Memories wall ────────────────────────────
    No `display` is declared on .wall, so the `hidden` attribute still works
    and the section stays out of the page until there is something approved. */
@@ -1103,6 +1019,4 @@ textarea { resize: vertical; min-height: 6rem; }
     filter: none !important;
     animation: none !important;
   }
-  .corridor { height: auto; }
-  .corridor__stage { position: relative; height: auto; min-height: 70svh; padding: 5rem 0; }
 }
