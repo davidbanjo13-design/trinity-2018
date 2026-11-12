@@ -164,7 +164,7 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
   min-height: 100svh;
   display: grid;
   align-content: center;
-  padding: 6rem var(--page) 7rem;
+  padding: 5rem var(--page) 6rem;
   overflow: hidden;
 }
 
@@ -290,18 +290,25 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
 
 .hero__title {
   font-family: var(--display);
-  font-size: clamp(2.65rem, 10.5vw, 7rem);
+  /* min trimmed a little: the title line is longer than the old one, and
+     this stops it breaking into three lines on a narrow phone */
+  font-size: clamp(2.1rem, 9.4vw, 6.6rem);
   line-height: 0.98;
   letter-spacing: -0.03em;
 }
-.hero__title .line { display: block; }
+.hero__title .line {
+  display: block;
+  /* If "Trinity Class of 2018" has to wrap on a narrow phone, split it evenly
+     rather than orphaning "2018" on a line of its own */
+  text-wrap: balance;
+}
 .hero__title .accent {
   color: var(--gold);
   font-style: italic;
 }
 
 .hero__sub {
-  margin-top: 2rem;
+  margin-top: 1.5rem;
   max-width: 34rem;
   font-size: clamp(1.1rem, 3.6vw, 1.5rem);
   line-height: 1.45;
@@ -310,7 +317,7 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
 .hero__sub strong { color: var(--text); font-weight: 500; }
 
 .hero__actions {
-  margin-top: 2.75rem;
+  margin-top: 2.25rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -323,7 +330,6 @@ html.js-on .loader.is-done { opacity: 0; visibility: hidden; }
 /* Insurance for type over a photo: the crop shifts with viewport, so a bright
    patch can land under the text on some screens and not others. Costs nothing
    on the dark areas and saves legibility on the light ones. */
-.hero .eyebrow,
 .hero__title,
 .hero__sub,
 .hero__note {
